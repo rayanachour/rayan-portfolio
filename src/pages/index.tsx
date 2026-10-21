@@ -1,242 +1,188 @@
 import Container from "@/components/Container";
-import { useEffect, useRef, Suspense, useState } from "react";
+import ContactForm from "@/components/ContactForm";
+import { useEffect, useState } from "react";
 import styles from "@/styles/Home.module.css";
 import { Button } from "@/components/ui/button";
 import {
+  ArrowRight,
+  CalendarCheck,
+  Check,
   ChevronRight,
   Code2,
   Frame,
-  SearchCheck,
-  Eye,
   MonitorSmartphone,
+  SearchCheck,
+  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 import { TriangleDownIcon } from "@radix-ui/react-icons";
-import Spline from "@splinetool/react-spline";
 import Link from "next/link";
 import { cn, scrollTo } from "@/lib/utils";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from "@/components/ui/carousel";
-import VanillaTilt from "vanilla-tilt";
 import { motion } from "framer-motion";
+import {
+  aboutCopy,
+  aboutStats,
+  aiAutomation,
+  audience,
+  faq,
+  processSteps,
+  profile,
+  services,
+} from "@/data/content";
 
-const aboutStats = [
-  { label: "Years of experience", value: "3+" },
-  { label: "Technologies mastered", value: "5+" },
-  { label: "Companies worked with", value: "15+" },
-];
+const serviceIcons: Record<string, LucideIcon> = {
+  Code2,
+  Frame,
+  SearchCheck,
+  MonitorSmartphone,
+  CalendarCheck,
+};
 
-const projects = [
-  {
-    title: "Unqueue",
-    description: "E-commerce platform for selling digital products",
-    image: "/assets/unqueue.webm",
-    href: "https://unqueue.shop/",
-  },
-  {
-    title: "InfiniteVPS",
-    description: "High performance VPS hosting solution",
-    image: "/assets/infinitevps.webm",
-    href: "#",
-  },
-  {
-    title: "TranslateBot",
-    description: "Powerful Multilingual Translation Bot for Discord",
-    image: "/assets/translate_bot.webm",
-    href: "https://translatebot.app/",
-  },
-  {
-    title: "Wrona",
-    description: "Robotics-focused technology company",
-    image: "/assets/wrona.jpeg",
-    href: "https://www.wrona.com/",
-  },
-  {
-    title: "This website",
-    description: "My personal website",
-    image: "/assets/portfolio.webm",
-    href: "https://github.com/wendoj/portfolio",
-  },
-];
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] },
+  }),
+};
 
-const services = [
-  {
-    service: "Frontend Development",
-    description:
-      "Creating stellar user interfaces and web experiences using the latest technologies.",
-    icon: Code2,
-  },
-  {
-    service: "UX Design",
-    description:
-      "Building intuitive, user-centric designs that drive engagement and conversion.",
-    icon: Frame,
-  },
-  {
-    service: "SEO Optimization",
-    description:
-      "Enhancing your website's visibility in search engines for increased organic traffic.",
-    icon: SearchCheck,
-  },
-  {
-    service: "Responsive Design",
-    description:
-      "Designing websites that look and perform equally well on all devices and screen sizes.",
-    icon: MonitorSmartphone,
-  },
-  {
-    service: "Backend Development",
-    description:
-      "Developing robust, scalable server-side logic for a wide range of web applications.",
-    icon: Eye,
-  },
-];
+const goToContact = () => scrollTo(document.querySelector("#contact"));
 
 export default function Home() {
-  const refScrollContainer = useRef(null);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
-  const [current, setCurrent] = useState<number>(0);
-  const [count, setCount] = useState<number>(0);
 
-  // handle scroll
+  // Highlight the nav link for the section in view. Native scrolling —
+  // no smooth-scroll library, so the browser can composite normally.
   useEffect(() => {
-    const sections = document.querySelectorAll("section");
-    const navLinks = document.querySelectorAll(".nav-link");
+    const sections = Array.from(document.querySelectorAll("section"));
+    const navLinks = Array.from(document.querySelectorAll(".nav-link"));
+    let ticking = false;
 
-    async function getLocomotive() {
-      const Locomotive = (await import("locomotive-scroll")).default;
-      new Locomotive({
-        el: refScrollContainer.current ?? new HTMLElement(),
-        smooth: true,
-      });
-    }
+    function update() {
+      ticking = false;
+      const y = window.scrollY;
+      setIsScrolled(y > 0);
 
-    function handleScroll() {
       let current = "";
-      setIsScrolled(window.scrollY > 0);
-
-      sections.forEach((section) => {
-        const sectionTop = section.offsetTop;
-        if (window.scrollY >= sectionTop - 250) {
-          current = section.getAttribute("id") ?? "";
-        }
-      });
-
-      navLinks.forEach((li) => {
-        li.classList.remove("nav-active");
-
-        if (li.getAttribute("href") === `#${current}`) {
-          li.classList.add("nav-active");
-          console.log(li.getAttribute("href"));
-        }
-      });
+      for (const section of sections) {
+        if (y >= section.offsetTop - 250) current = section.id;
+      }
+      for (const link of navLinks) {
+        link.classList.toggle(
+          "nav-active",
+          link.getAttribute("href") === `#${current}`,
+        );
+      }
     }
 
-    void getLocomotive();
-    window.addEventListener("scroll", handleScroll);
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        window.requestAnimationFrame(update);
+      }
+    }
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!carouselApi) return;
-
-    setCount(carouselApi.scrollSnapList().length);
-    setCurrent(carouselApi.selectedScrollSnap() + 1);
-
-    carouselApi.on("select", () => {
-      setCurrent(carouselApi.selectedScrollSnap() + 1);
-    });
-  }, [carouselApi]);
-
-  // card hover effect
-  useEffect(() => {
-    const tilt: HTMLElement[] = Array.from(document.querySelectorAll("#tilt"));
-    VanillaTilt.init(tilt, {
-      speed: 300,
-      glare: true,
-      "max-glare": 0.1,
-      gyroscope: true,
-      perspective: 900,
-      scale: 0.9,
-    });
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <Container>
-      <div ref={refScrollContainer}>
-        <Gradient />
+      <div>
+        {/* Prism light — a single static gradient, painted once */}
+        <div className="prism" aria-hidden="true" />
 
-        {/* Intro */}
+        {/* ------------------------------------------------------------ */}
+        {/* Hero                                                           */}
+        {/* ------------------------------------------------------------ */}
         <section
           id="home"
-          data-scroll-section
-          className="mt-40 flex w-full flex-col items-center xl:mt-0 xl:min-h-screen xl:flex-row xl:justify-between"
+          className="mt-32 flex w-full flex-col items-center gap-14 xl:mt-0 xl:min-h-screen xl:flex-row xl:items-center xl:justify-between xl:gap-16"
         >
-          <div className={styles.intro}>
-            <div
-              data-scroll
-              data-scroll-direction="horizontal"
-              data-scroll-speed=".09"
-              className="flex flex-row items-center space-x-1.5"
+          <div className={cn(styles.intro, "xl:max-w-[38rem]")}>
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="eyebrow"
             >
-              <span className={styles.pill}>next.js</span>
-              <span className={styles.pill}>tailwindcss</span>
-              <span className={styles.pill}>typescript</span>
-            </div>
-            <div>
-              <h1
-                data-scroll
-                data-scroll-enable-touch-speed
-                data-scroll-speed=".06"
-                data-scroll-direction="horizontal"
-              >
-                <span className="text-6xl tracking-tighter text-foreground 2xl:text-8xl">
-                  Hello, I&apos;m
-                  <br />
-                </span>
-                <span className="clash-grotesk text-gradient text-6xl 2xl:text-8xl">
-                  WendoJ.
-                </span>
-              </h1>
-              <p
-                data-scroll
-                data-scroll-enable-touch-speed
-                data-scroll-speed=".06"
-                className="mt-1 max-w-lg tracking-tight text-muted-foreground 2xl:text-xl"
-              >
-                An experienced full-stack website developer with a passion for
-                crafting unique digital experiences.
-              </p>
-            </div>
-            <span
-              data-scroll
-              data-scroll-enable-touch-speed
-              data-scroll-speed=".06"
-              className="flex flex-row items-center space-x-1.5 pt-6"
+              {profile.role} — {profile.location}
+            </motion.p>
+
+            <motion.h1
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={1}
+              className="display mt-6 text-[3.5rem] sm:text-7xl 2xl:text-[6rem]"
             >
-              <Link href="mailto:wendoj@proton.me" passHref>
-                <Button>
-                  Get in touch <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
-              </Link>
-              <Button
-                variant="outline"
-                onClick={() => scrollTo(document.querySelector("#about"))}
-              >
-                Learn more
+              Your business,{" "}
+              <span className="text-gradient italic">running smoother.</span>
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={2}
+              className="mt-6 max-w-lg text-base leading-relaxed tracking-tight text-muted-foreground 2xl:text-lg"
+            >
+              {profile.tagline}
+            </motion.p>
+
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={3}
+              className="mt-6 flex flex-wrap items-center gap-1.5"
+            >
+              {profile.pills.map((item) => (
+                <span key={item} className={styles.pill}>
+                  {item}
+                </span>
+              ))}
+            </motion.div>
+
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={4}
+              className="mt-8 flex flex-row flex-wrap items-center gap-3"
+            >
+              <Button variant="metal" onClick={goToContact}>
+                {profile.cta} <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
-            </span>
+              <Button
+                variant="glass"
+                onClick={() => scrollTo(document.querySelector("#services"))}
+              >
+                See what I do
+              </Button>
+            </motion.div>
+
+            {/* Trust line */}
+            <motion.ul
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={5}
+              className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2"
+            >
+              {profile.trust.map((t) => (
+                <li
+                  key={t}
+                  className="flex items-center gap-2 text-xs tracking-tight text-muted-foreground"
+                >
+                  <Check className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
+                  {t}
+                </li>
+              ))}
+            </motion.ul>
 
             <div
               className={cn(
@@ -244,274 +190,317 @@ export default function Home() {
                 isScrolled && styles["scroll--hidden"],
               )}
             >
-              Scroll to discover{" "}
-              <TriangleDownIcon className="mt-1 animate-bounce" />
+              <span className="eyebrow">Scroll to discover</span>
+              <TriangleDownIcon className="mt-2 animate-bounce" />
             </div>
           </div>
-          <div
-            data-scroll
-            data-scroll-speed="-.01"
-            id={styles["canvas-container"]}
-            className="mt-14 h-full w-full xl:mt-0"
+
+          {/* Portrait — the glass chip overlaps the photo so the frost is visible (tip #6) */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
+            className="relative w-full max-w-[26rem] xl:max-w-[30rem]"
           >
-            <Suspense fallback={<span>Loading...</span>}>
-              <Spline scene="/assets/scene.splinecode" />
-            </Suspense>
-          </div>
+            <div className={styles.portrait}>
+              <Image
+                src={profile.photo}
+                alt={`${profile.name}, seated on a marble bench in Philadelphia`}
+                width={692}
+                height={1024}
+                priority
+                sizes="(min-width: 1280px) 30rem, 26rem"
+              />
+            </div>
+            <div className="glass glass-frost absolute -bottom-2 left-6 right-6 flex items-center justify-between rounded-2xl px-5 py-4">
+              <div className="flex flex-col gap-1.5">
+                <span className="eyebrow">{profile.name}</span>
+                <span className="text-sm tracking-tight text-foreground">
+                  {profile.dayJob} — {profile.company}
+                </span>
+              </div>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-secondary opacity-60" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-secondary" />
+              </span>
+            </div>
+          </motion.div>
         </section>
 
-        {/* About */}
-        <section id="about" data-scroll-section>
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="my-14 flex max-w-6xl flex-col justify-start space-y-10"
-          >
-            <h2 className="py-16  pb-2 text-3xl font-light leading-normal tracking-tighter text-foreground xl:text-[40px]">
-              I&apos;m an experienced full-stack developer proficient in{" "}
-              <Link
-                href="https://create.t3.gg/"
-                target="_blank"
-                className="underline"
-              >
-                TypeScript, Tailwind, and Next.js
-              </Link>{" "}
-              since 2021. My experience spans from startups to mid-sized
-              companies, where I&apos;ve been instrumental in the entire product
-              design process; from ideation and wireframing, through
-              prototyping, to the delivery of the final product, all while
-              efficiently collaborating with cross-functional teams.
+        {/* ------------------------------------------------------------ */}
+        {/* About                                                          */}
+        {/* ------------------------------------------------------------ */}
+        <section id="about" className="mt-40 xl:mt-0">
+          <div className="flex max-w-5xl flex-col justify-start">
+            <span className="eyebrow">About</span>
+            <h2 className="display mt-6 text-3xl leading-[1.15] text-foreground sm:text-4xl xl:text-[2.75rem]">
+              {aboutCopy}
             </h2>
-            <div className="grid grid-cols-2 gap-8 xl:grid-cols-3">
+
+            <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3 xl:gap-10">
               {aboutStats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="flex flex-col items-center text-center xl:items-start xl:text-start"
-                >
-                  <span className="clash-grotesk text-gradient text-4xl font-semibold tracking-tight xl:text-6xl">
+                <div key={stat.label} className="flex flex-col items-start">
+                  <span className="display text-gradient text-5xl xl:text-7xl">
                     {stat.value}
                   </span>
-                  <span className="tracking-tight text-muted-foreground xl:text-lg">
+                  <span className="mt-2 max-w-[16rem] text-sm tracking-tight text-muted-foreground xl:text-base">
                     {stat.label}
                   </span>
                 </div>
               ))}
             </div>
           </div>
-        </section>
 
-        {/* Projects */}
-        <section id="projects" data-scroll-section>
-          {/* Gradient */}
-          <div className="relative isolate -z-10">
-            <div
-              className="absolute inset-x-0 -top-40 transform-gpu overflow-hidden blur-[100px] sm:-top-80 lg:-top-60"
-              aria-hidden="true"
-            >
-              <div
-                className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-primary via-primary to-secondary opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"
-                style={{
-                  clipPath:
-                    "polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)",
-                }}
-              />
-            </div>
-          </div>
-          <div data-scroll data-scroll-speed=".4" className="my-64">
-            <span className="text-gradient clash-grotesk text-sm font-semibold tracking-tighter">
-              ✨ Projects
-            </span>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight tracking-tighter xl:text-6xl">
-              Streamlined digital experiences.
-            </h2>
-            <p className="mt-1.5 text-base tracking-tight text-muted-foreground xl:text-lg">
-              I&apos;ve worked on a variety of projects, from small websites to
-              large-scale web applications. Here are some of my favorites:
-            </p>
-
-            {/* Carousel */}
-            <div className="mt-14">
-              <Carousel setApi={setCarouselApi} className="w-full">
-                <CarouselContent>
-                  {projects.map((project) => (
-                    <CarouselItem key={project.title} className="md:basis-1/2">
-                      <Card id="tilt">
-                        <CardHeader className="p-0">
-                          <Link href={project.href} target="_blank" passHref>
-                            {project.image.endsWith(".webm") ? (
-                              <video
-                                src={project.image}
-                                autoPlay
-                                loop
-                                muted
-                                className="aspect-video h-full w-full rounded-t-md bg-primary object-cover"
-                              />
-                            ) : (
-                              <Image
-                                src={project.image}
-                                alt={project.title}
-                                width={600}
-                                height={300}
-                                quality={100}
-                                className="aspect-video h-full w-full rounded-t-md bg-primary object-cover"
-                              />
-                            )}
-                          </Link>
-                        </CardHeader>
-                        <CardContent className="absolute bottom-0 w-full bg-background/50 backdrop-blur">
-                          <CardTitle className="border-t border-white/5 p-4 text-base font-normal tracking-tighter">
-                            {project.description}
-                          </CardTitle>
-                        </CardContent>
-                      </Card>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
-              </Carousel>
-              <div className="py-2 text-center text-sm text-muted-foreground">
-                <span className="font-semibold">
-                  {current} / {count}
-                </span>{" "}
-                projects
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Services */}
-        <section id="services" data-scroll-section>
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="my-24 flex flex-col justify-start space-y-10"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 1,
-                staggerChildren: 0.5,
-              }}
-              viewport={{ once: true }}
-              className="grid items-center gap-1.5 md:grid-cols-2 xl:grid-cols-3"
-            >
-              <div className="flex flex-col py-6 xl:p-6">
-                <h2 className="text-4xl font-medium tracking-tight">
-                  Need more info?
-                  <br />
-                  <span className="text-gradient clash-grotesk tracking-normal">
-                    I got you.
-                  </span>
-                </h2>
-                <p className="mt-2 tracking-tighter text-secondary-foreground">
-                  Here are some of the services I offer. If you have any
-                  questions, feel free to reach out.
+          {/* Who it's for */}
+          <div className="relative mt-20">
+            <div className="dot-grid absolute inset-0 -z-10" aria-hidden="true" />
+            <div className="glass flex flex-col gap-6 rounded-3xl p-8 md:flex-row md:items-center md:justify-between xl:p-10">
+              <div className="md:max-w-xs">
+                <span className="eyebrow">Who I work with</span>
+                <p className="mt-3 font-serif text-2xl tracking-tight xl:text-3xl">
+                  Owner-run businesses that live on word of mouth — and want
+                  the online experience to match.
                 </p>
               </div>
-              {services.map((service) => (
+              <ul className="grid flex-1 grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
+                {audience.map((a) => (
+                  <li
+                    key={a}
+                    className="flex items-center gap-2.5 text-sm tracking-tight text-foreground/85"
+                  >
+                    <span
+                      className="h-px w-4 shrink-0 bg-gradient-to-r from-primary to-secondary"
+                      aria-hidden="true"
+                    />
+                    {a}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------ */}
+        {/* Services                                                       */}
+        {/* ------------------------------------------------------------ */}
+        <section id="services" className="my-40">
+          <div>
+            <span className="eyebrow">What I do</span>
+            <h2 className="display mt-6 text-4xl sm:text-5xl xl:text-6xl">
+              More bookings. <span className="text-gradient italic">Less admin.</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-base tracking-tight text-muted-foreground xl:text-lg">
+              Two things make the biggest difference for a local business: a
+              website people trust, and the busywork handled for you. I do both.
+            </p>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ staggerChildren: 0.08 }}
+              className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+            >
+              {/* Featured: AI automation */}
+              <motion.div
+                variants={fadeUp}
+                className="glass glass-strong glass-hover relative flex flex-col overflow-hidden rounded-3xl p-8 md:col-span-2 xl:row-span-2 xl:p-10"
+              >
                 <div
-                  key={service.service}
-                  className="flex flex-col items-start rounded-md bg-white/5 p-14 shadow-md backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:bg-white/10 hover:shadow-md"
-                >
-                  <service.icon className="my-6 text-primary" size={20} />
-                  <span className="text-lg tracking-tight text-foreground">
-                    {service.service}
+                  className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full"
+                  style={{
+                    background:
+                      "radial-gradient(closest-side, hsl(26 90% 72% / 0.28), hsl(26 90% 72% / 0.08) 50%, transparent 72%)",
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="flex items-center gap-3">
+                  <span className="metal inline-flex h-10 w-10 items-center justify-center rounded-full">
+                    <Sparkles size={18} />
                   </span>
-                  <span className="mt-2 tracking-tighter text-muted-foreground">
-                    {service.description}
-                  </span>
+                  <span className="eyebrow">Most popular</span>
                 </div>
-              ))}
+                <h3 className="mt-6 font-serif text-3xl tracking-tight xl:text-4xl">
+                  {aiAutomation.service}
+                </h3>
+                <p className="mt-3 max-w-xl text-base tracking-tight text-foreground/85">
+                  {aiAutomation.lead}
+                </p>
+
+                <div className="mt-8 grid gap-8 lg:grid-cols-2">
+                  <div>
+                    <span className="eyebrow">Sound familiar?</span>
+                    <ul className="mt-4 flex flex-col gap-3">
+                      {aiAutomation.problems.map((p) => (
+                        <li
+                          key={p}
+                          className="flex gap-3 text-sm leading-relaxed tracking-tight text-muted-foreground"
+                        >
+                          <span
+                            className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary"
+                            aria-hidden="true"
+                          />
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <span className="eyebrow">What you get</span>
+                    <ul className="mt-4 flex flex-col gap-3">
+                      {aiAutomation.outcomes.map((o) => (
+                        <li
+                          key={o}
+                          className="flex gap-3 text-sm leading-relaxed tracking-tight text-foreground/85"
+                        >
+                          <Check
+                            className="mt-1 h-3.5 w-3.5 shrink-0 text-primary"
+                            aria-hidden="true"
+                          />
+                          {o}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <p className="mt-8 max-w-2xl text-sm leading-relaxed tracking-tight text-muted-foreground">
+                  {aiAutomation.solution}
+                </p>
+                <div className="mt-6">
+                  <Button variant="metal" size="sm" onClick={goToContact}>
+                    Get a free automation audit{" "}
+                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </motion.div>
+
+              {services.map((service) => {
+                const Icon = serviceIcons[service.icon] ?? Code2;
+                return (
+                  <motion.div
+                    key={service.service}
+                    variants={fadeUp}
+                    className="glass glass-hover flex flex-col items-start justify-end rounded-3xl p-8"
+                  >
+                    <Icon className="text-primary" size={20} />
+                    <span className="mt-auto pt-8 font-serif text-2xl tracking-tight text-foreground">
+                      {service.service}
+                    </span>
+                    <span className="mt-2 text-sm leading-relaxed tracking-tight text-muted-foreground">
+                      {service.description}
+                    </span>
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </div>
         </section>
 
-        {/* Contact */}
-        <section id="contact" data-scroll-section className="my-64">
-          <div
-            data-scroll
-            data-scroll-speed=".4"
-            data-scroll-position="top"
-            className="flex flex-col items-center justify-center rounded-lg bg-gradient-to-br from-primary/[6.5%] to-white/5 px-8 py-16 text-center xl:py-24"
-          >
-            <h2 className="text-4xl font-medium tracking-tighter xl:text-6xl">
-              Let&apos;s work{" "}
-              <span className="text-gradient clash-grotesk">together.</span>
+        {/* ------------------------------------------------------------ */}
+        {/* Process                                                        */}
+        {/* ------------------------------------------------------------ */}
+        <section id="process" className="my-40">
+          <div>
+            <span className="eyebrow">How it works</span>
+            <h2 className="display mt-6 text-4xl sm:text-5xl xl:text-6xl">
+              Simple from <span className="text-gradient italic">start to launch</span>.
             </h2>
-            <p className="mt-1.5 text-base tracking-tight text-muted-foreground xl:text-lg">
-              I&apos;m currently available for freelance work and open to
-              discussing new projects.
-            </p>
-            <Link href="mailto:wendoj@proton.me" passHref>
-              <Button className="mt-6">Get in touch</Button>
-            </Link>
+
+            <ol className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {processSteps.map((step, i) => (
+                <motion.li
+                  key={step.step}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-80px" }}
+                  custom={i}
+                  className="glass glass-hover relative flex flex-col rounded-3xl p-8"
+                >
+                  <span className="display text-gradient text-5xl">{step.step}</span>
+                  <h3 className="mt-8 font-serif text-2xl tracking-tight">
+                    {step.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed tracking-tight text-muted-foreground">
+                    {step.description}
+                  </p>
+                  {i < processSteps.length - 1 && (
+                    <ArrowRight
+                      className="absolute -right-4 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-foreground/30 xl:block"
+                      aria-hidden="true"
+                    />
+                  )}
+                </motion.li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------ */}
+        {/* FAQ                                                            */}
+        {/* ------------------------------------------------------------ */}
+        <section id="faq" className="my-40">
+          <div className="grid gap-10 xl:grid-cols-[20rem_1fr]">
+            <div>
+              <span className="eyebrow">Questions</span>
+              <h2 className="display mt-6 text-4xl sm:text-5xl">
+                Things owners <span className="text-gradient italic">usually ask</span>.
+              </h2>
+              <p className="mt-4 text-sm tracking-tight text-muted-foreground">
+                Something else on your mind? Ask it in the form below — there
+                are no silly questions.
+              </p>
+            </div>
+            <dl>
+              {faq.map((item, i) => (
+                <div key={item.q}>
+                  {i > 0 && <hr className="divider-inset my-7" />}
+                  <dt className="font-serif text-2xl tracking-tight">{item.q}</dt>
+                  <dd className="mt-2 max-w-2xl text-sm leading-relaxed tracking-tight text-muted-foreground">
+                    {item.a}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        {/* ------------------------------------------------------------ */}
+        {/* Contact                                                        */}
+        {/* ------------------------------------------------------------ */}
+        <section id="contact" className="my-40">
+          <div className="relative">
+            {/* texture + glow behind the glass so the frost reads (tip #6).
+                Both are plain gradients — no filter: blur — so they paint once. */}
+            <div className="dot-grid absolute inset-0 -z-10" aria-hidden="true" />
+            <div className="glow-contact absolute inset-0 -z-10 rounded-[2rem]" aria-hidden="true" />
+            <div className="glass glass-frost grid gap-12 rounded-[2rem] p-8 sm:p-12 xl:grid-cols-[22rem_1fr] xl:p-16">
+              <div>
+                <span className="eyebrow">Contact</span>
+                <h2 className="display mt-6 text-5xl sm:text-6xl">
+                  Let&apos;s talk about{" "}
+                  <span className="text-gradient italic">your</span> business.
+                </h2>
+                <p className="mt-5 text-base tracking-tight text-muted-foreground">
+                  Tell me a little about what you do and what&apos;s eating your
+                  time. I&apos;ll come back with ideas — free, no commitment.
+                </p>
+                <div className="mt-8 flex flex-col gap-3 text-sm">
+                  <span className="eyebrow">Prefer email?</span>
+                  <Link
+                    href={`mailto:${profile.email}`}
+                    className="font-mono text-xs text-foreground underline-offset-4 hover:underline"
+                  >
+                    {profile.email}
+                  </Link>
+                </div>
+              </div>
+              <ContactForm />
+            </div>
           </div>
         </section>
       </div>
     </Container>
-  );
-}
-
-function Gradient() {
-  return (
-    <>
-      {/* Upper gradient */}
-      <div className="absolute -top-40 right-0 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-        <svg
-          className="relative left-[calc(50%-11rem)] -z-10 h-[21.1875rem] max-w-none -translate-x-1/2 rotate-[30deg] sm:left-[calc(50%-30rem)] sm:h-[42.375rem]"
-          viewBox="0 0 1155 678"
-        >
-          <path
-            fill="url(#45de2b6b-92d5-4d68-a6a0-9b9b2abad533)"
-            fillOpacity=".1"
-            d="M317.219 518.975L203.852 678 0 438.341l317.219 80.634 204.172-286.402c1.307 132.337 45.083 346.658 209.733 145.248C936.936 126.058 882.053-94.234 1031.02 41.331c119.18 108.451 130.68 295.337 121.53 375.223L855 299l21.173 362.054-558.954-142.079z"
-          />
-          <defs>
-            <linearGradient
-              id="45de2b6b-92d5-4d68-a6a0-9b9b2abad533"
-              x1="1155.49"
-              x2="-78.208"
-              y1=".177"
-              y2="474.645"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#7980fe" />
-              <stop offset={1} stopColor="#f0fff7" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {/* Lower gradient */}
-      <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">
-        <svg
-          className="relative left-[calc(50%+3rem)] h-[21.1875rem] max-w-none -translate-x-1/2 sm:left-[calc(50%+36rem)] sm:h-[42.375rem]"
-          viewBox="0 0 1155 678"
-        >
-          <path
-            fill="url(#ecb5b0c9-546c-4772-8c71-4d3f06d544bc)"
-            fillOpacity=".1"
-            d="M317.219 518.975L203.852 678 0 438.341l317.219 80.634 204.172-286.402c1.307 132.337 45.083 346.658 209.733 145.248C936.936 126.058 882.053-94.234 1031.02 41.331c119.18 108.451 130.68 295.337 121.53 375.223L855 299l21.173 362.054-558.954-142.079z"
-          />
-          <defs>
-            <linearGradient
-              id="ecb5b0c9-546c-4772-8c71-4d3f06d544bc"
-              x1="1155.49"
-              x2="-78.208"
-              y1=".177"
-              y2="474.645"
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopColor="#9A70FF" />
-              <stop offset={1} stopColor="#838aff" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-    </>
   );
 }

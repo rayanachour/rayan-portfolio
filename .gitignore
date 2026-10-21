@@ -44,3 +44,6 @@ yarn-error.log*
 # webstorm
 .idea
 ```
+# next-pwa build output
+public/service-worker.js
+public/workbox-*.js

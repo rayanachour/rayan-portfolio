@@ -1,33 +1,40 @@
-
 /* hero */
 .intro {
-    @apply flex flex-col items-start space-y-4 w-full;
+  @apply flex w-full flex-col items-start;
 }
 .pill {
-    @apply transition border border-input bg-background flex items-center text-xs px-2.5 py-1.5 rounded-full hover:-translate-y-1 hover:bg-primary hover:text-primary-foreground duration-300;
-}
-.intro h1 {
-    @apply pt-2 leading-tight;
+  @apply font-mono flex items-center rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[11px] lowercase text-muted-foreground transition duration-300 hover:-translate-y-0.5 hover:border-primary/60 hover:text-foreground;
+  letter-spacing: 0.08em;
 }
 
 /* scroll down */
 .scroll {
-    @apply transition duration-300 absolute bottom-6 left-1/2 mb-8 hidden -translate-x-1/2 transform-gpu flex-col items-center text-sm text-slate-400 xl:flex tracking-tight;
+  @apply absolute bottom-6 left-1/2 mb-8 hidden -translate-x-1/2 transform-gpu flex-col items-center text-muted-foreground transition duration-300 xl:flex;
 }
 .scroll--hidden {
-    @apply opacity-0 transition duration-300;
+  @apply opacity-0 transition duration-300;
 }
 
-/* projects */
-.project-card {
-    @apply p-14 bg-white/[1%] rounded-md;
+/* portrait frame: photo fades into the page so it sits *in* the design */
+.portrait {
+  @apply relative overflow-hidden rounded-[1.75rem];
+  aspect-ratio: 3 / 4;
+  -webkit-mask-image: linear-gradient(180deg, black 0%, black 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, black 0%, black 72%, transparent 100%);
 }
-
-/* spline canvas */
-#canvas-container
-{
-    @apply bg-background border rounded-3xl h-[515px] xl:w-[690px] xl:min-w-[690px] overflow-hidden;
-
-    /* this fixes the overflow:hidden in Chrome/Opera */
-    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+.portrait img {
+  @apply h-full w-full object-cover object-top;
+  transform: scale(1.02);
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.portrait:hover img {
+  transform: scale(1.05);
+}
+/* soft vignette so the marble doesn't glare against the dark page */
+.portrait::after {
+  content: "";
+  @apply pointer-events-none absolute inset-0;
+  background:
+    radial-gradient(120% 80% at 50% 20%, transparent 55%, hsl(240 14% 5% / 0.55) 100%),
+    linear-gradient(180deg, hsl(240 14% 5% / 0.15), transparent 40%);
 }

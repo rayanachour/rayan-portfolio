@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
 import Preloader from "@/components/Preloader";
 import styles from "@/styles/Container.module.css";
+import { profile } from "@/data/content";
 
 type IconProps = {
   ["data-hide"]: boolean;
@@ -39,8 +40,9 @@ const variants = {
 const navLinks = [
   { href: "#home", text: "Home" },
   { href: "#about", text: "About" },
-  { href: "#projects", text: "Projects" },
   { href: "#services", text: "Services" },
+  { href: "#process", text: "How it works" },
+  { href: "#faq", text: "FAQ" },
   { href: "#contact", text: "Contact" },
 ];
 
@@ -83,12 +85,13 @@ export default function Container(props: ContainerProps) {
   const { children, ...customMeta } = props;
   const router = useRouter();
   const meta = {
-    title: "Wendo",
-    description: `Full-stack website developer and TypeScript enthusiast.`,
-    image: "/assets/logo.webp",
+    title: `${profile.name} — Websites & AI Automation for Businesses`,
+    description: `${profile.tagline} Based in ${profile.location}.`,
+    image: profile.photo,
     type: "website",
     ...customMeta,
   };
+  const pageUrl = profile.siteUrl ? `${profile.siteUrl}${router.asPath}` : "";
 
   // handle scroll
   useEffect(() => {
@@ -105,11 +108,12 @@ export default function Container(props: ContainerProps) {
 
   // preloader effect
   useEffect(() => {
-    setTimeout(() => {
+    const t = setTimeout(() => {
       setIsLoading(false);
       document.body.style.cursor = "default";
       window.scrollTo(0, 0);
-    }, 2000);
+    }, 2300);
+    return () => clearTimeout(t);
   }, []);
 
   return (
@@ -117,26 +121,20 @@ export default function Container(props: ContainerProps) {
       <Head>
         <title>{meta.title}</title>
         <meta name="robots" content="follow, index" />
-        <meta name="theme-color" content="#7B82FE" />
+        <meta name="theme-color" content="#0b0b12" />
         <meta content={meta.description} name="description" />
-        <meta
-          property="og:url"
-          content={`https://www.wendoj.codes${router.asPath}`}
-        />
-        <link
-          rel="canonical"
-          href={`https://www.wendoj.codes${router.asPath}`}
-        />
+        {pageUrl && <meta property="og:url" content={pageUrl} />}
+        {pageUrl && <link rel="canonical" href={pageUrl} />}
         <meta property="og:type" content={meta.type} />
-        <meta property="og:site_name" content="WendoJ" />
+        <meta property="og:site_name" content={profile.name} />
         <meta property="og:description" content={meta.description} />
         <meta property="og:title" content={meta.title} />
         <meta property="og:image" content={meta.image} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="WendoJ" />
         <meta name="twitter:title" content={meta.title} />
         <meta name="twitter:description" content={meta.description} />
         <meta name="twitter:image" content={meta.image} />
+        <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </Head>
@@ -144,7 +142,7 @@ export default function Container(props: ContainerProps) {
         className={cn(
           styles.nav,
           isScrolled
-            ? "bg-gradient-to-br from-background to-transparent shadow-md backdrop-blur transition"
+            ? "bg-gradient-to-b from-background via-background/90 to-transparent transition"
             : "bg-transparent",
         )}
       >
@@ -156,15 +154,16 @@ export default function Container(props: ContainerProps) {
               "inline-flex transform items-center justify-center rounded-md p-2 transition-all duration-300 focus:outline-none",
             )}
             aria-controls="mobile-menu"
-            aria-expanded="false"
+            aria-expanded={isOpen}
           >
             <span className="sr-only">Open main menu</span>
             <MenuIcon data-hide={isOpen} />
             <CrossIcon data-hide={!isOpen} />
           </button>
         </div>
-        <Link href="/">
-          <span className="text-lg font-semibold">wendo</span>
+        <Link href="/" className="font-serif text-2xl tracking-tight">
+          {profile.handle}
+          <span className="text-gradient">.</span>
         </Link>
 
         {/* Desktop menu */}
@@ -192,14 +191,14 @@ export default function Container(props: ContainerProps) {
             >
               {/* Expandable menu */}
               <div className="flex h-20 max-h-20 min-h-[60px] w-full items-center justify-between border-b pl-[22px] pr-1">
-                <span className="text-base font-medium lowercase">Menu</span>
+                <span className="eyebrow">Menu</span>
                 <button
                   onClick={() => setIsOpen(!isOpen)}
                   className={styles.burger}
                   aria-controls="mobile-menu"
-                  aria-expanded="false"
+                  aria-expanded={isOpen}
                 >
-                  <span className="sr-only">Open main menu</span>
+                  <span className="sr-only">Close main menu</span>
                   <CrossIcon data-hide={!isOpen} />
                 </button>
               </div>
@@ -221,7 +220,7 @@ export default function Container(props: ContainerProps) {
                 {/* Footer */}
                 <div className="flex min-h-fit w-full flex-col space-y-8 px-[22px] py-10">
                   <span className="text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} wendo. All rights reserved.
+                    © {new Date().getFullYear()} {profile.name}
                   </span>
                 </div>
               </div>

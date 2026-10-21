@@ -1,44 +1,49 @@
-@import "clash-grotesk.css";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ------------------------------------------------------------------ */
+/* Tokens                                                              */
+/* ------------------------------------------------------------------ */
 @layer base {
   :root {
-    --background: 240 27.9% 5.7%;
-    --foreground: 210 40% 98%;
+    /* near-black with a cool tint; warm off-white text echoes the photo */
+    --background: 240 14% 5%;
+    --foreground: 40 18% 95%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 240 14% 7%;
+    --card-foreground: 40 18% 95%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 240 14% 6%;
+    --popover-foreground: 40 18% 95%;
 
-    --primary: 237 99% 74%;
-    --primary-foreground: 0 0% 0%;
+    /* prism pair: violet-blue → peach. Used for gradients & accents. */
+    --primary: 236 92% 76%;
+    --primary-foreground: 240 14% 5%;
 
-    --secondary: 214.2 98.47% 74.31%;
-    --secondary-foreground: 218 11% 65%;
+    --secondary: 26 90% 72%;
+    --secondary-foreground: 220 10% 68%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 240 10% 16%;
+    --muted-foreground: 225 12% 66%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 240 10% 16%;
+    --accent-foreground: 40 18% 95%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 240 10% 18%;
+    --input: 240 10% 20%;
+    --ring: 236 92% 76%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
-/* global elements */
+/* ------------------------------------------------------------------ */
+/* Base elements                                                       */
+/* ------------------------------------------------------------------ */
 @layer base {
   html[data-scroll-orientation="horizontal"] {
     body {
@@ -56,9 +61,13 @@
   }
   body {
     @apply bg-background text-foreground cursor-wait;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
   section {
     scroll-margin-top: 60px;
+  }
+  ::selection {
+    background: hsl(var(--primary) / 0.35);
   }
 }
 
@@ -78,24 +87,215 @@
   }
 }
 
-/* custom styles */
-@layer base {
-  .clash-grotesk {
-    font-family: "ClashGrotesk-Variable", sans-serif;
-  }
-  .text-gradient {
-    @apply bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent;
-  }
-  .nav-active {
-    color: rgb(226 232 240) !important;
-    @apply text-sm lowercase tracking-tight text-slate-200;
-  }
-  .nav-link {
-    /* Remove the styles from nav-link class */
-    @apply text-sm lowercase tracking-tight text-slate-400;
+/* ------------------------------------------------------------------ */
+/* Typography utilities (tips #1–#3)                                   */
+/* ------------------------------------------------------------------ */
+@layer components {
+  /* Display headline: big text needs less letter-space and less leading */
+  .display {
+    @apply font-serif;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+    font-weight: 400;
   }
 
-  /* blinking animation */
+  /* Small uppercase needs MORE letter-space for legibility */
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase text-muted-foreground;
+    letter-spacing: 0.18em;
+    line-height: 1.6;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-primary via-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  .nav-link {
+    @apply font-mono text-xs lowercase text-slate-400 transition-colors duration-300 hover:text-foreground;
+    letter-spacing: 0.06em;
+  }
+  .nav-active {
+    @apply text-foreground;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Materials (tip #5)                                                  */
+/* ------------------------------------------------------------------ */
+@layer components {
+  /*
+   * Frosted glass.
+   * - low *fill* opacity (not layer opacity) so the backdrop blur can work
+   * - tint carries the background hue for richness
+   * - inset sheen on top where the light hits…
+   * - …and a BRIGHTER sheen on the bottom edge — physically odd for most
+   *   materials, but exactly what glass does.
+   */
+  /*
+   * PERF: `.glass` is a cheap surface (no backdrop-filter). Most cards sit on
+   * a flat dark background, so there is nothing to blur anyway. Add
+   * `.glass-frost` only where the element genuinely overlaps content
+   * (hero chip, contact card, inputs) — each backdrop-filter forces the GPU
+   * to re-composite everything behind it on every scroll frame.
+   */
+  .glass {
+    position: relative;
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.07) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 18% 11% / 0.85);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.22),
+      inset 0 -1px 0 0 hsl(0 0% 100% / 0.32),
+      0 30px 60px -30px hsl(240 40% 2% / 0.9);
+  }
+  .glass-frost {
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.07) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 30% 70% / 0.08);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+  .glass-strong {
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 18% 13% / 0.9);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.3),
+      inset 0 -1px 0 0 hsl(0 0% 100% / 0.42),
+      0 40px 80px -30px hsl(240 40% 2% / 0.95);
+  }
+  .glass-hover {
+    transition:
+      transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      background 0.4s;
+  }
+  .glass-hover:hover {
+    transform: translateY(-2px);
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 18% 14% / 0.9);
+  }
+
+  /* Frosted-glass form field. 48px tall → 16px radius; padding matches. */
+  .glass-input {
+    @apply w-full rounded-2xl px-4 py-3 text-sm tracking-tight text-foreground outline-none placeholder:text-muted-foreground/60;
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.06) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 30% 70% / 0.06);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.18),
+      inset 0 -1px 0 0 hsl(0 0% 100% / 0.26),
+      0 0 0 1px hsl(0 0% 100% / 0.04);
+    transition:
+      box-shadow 0.25s ease,
+      background 0.25s ease;
+  }
+  .glass-input:hover {
+    background:
+      linear-gradient(180deg, hsl(0 0% 100% / 0.08) 0%, hsl(0 0% 100% / 0) 60%),
+      hsl(240 30% 70% / 0.08);
+  }
+  .glass-input:focus-visible {
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.22),
+      inset 0 -1px 0 0 hsl(0 0% 100% / 0.3),
+      0 0 0 1px hsl(var(--primary) / 0.7),
+      0 0 0 5px hsl(var(--primary) / 0.15);
+  }
+
+  /*
+   * Brushed metal. Light gradient, dark text, dark bottom edge, tight shadow
+   * (it sits right on the surface, so blur stays ≤ 4px).
+   */
+  .metal {
+    color: hsl(240 14% 8%);
+    background: linear-gradient(180deg, #f7f4ee 0%, #e4dfd6 55%, #d6d0c6 100%);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.95),
+      inset 0 -1px 0 0 hsl(30 10% 20% / 0.22),
+      0 1px 2px 0 hsl(240 40% 2% / 0.5),
+      0 4px 4px -2px hsl(240 40% 2% / 0.35);
+    transition:
+      transform 0.25s ease,
+      filter 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+  .metal:hover {
+    filter: brightness(1.04);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.95),
+      inset 0 -1px 0 0 hsl(30 10% 20% / 0.22),
+      0 2px 3px 0 hsl(240 40% 2% / 0.5),
+      0 8px 10px -4px hsl(240 40% 2% / 0.4);
+  }
+  .metal:active {
+    transform: translateY(0);
+    filter: brightness(0.98);
+  }
+
+  /*
+   * Indented divider. Light comes from the sky, so the top pixel faces away
+   * (darker) and the bottom pixel faces toward it (lighter).
+   */
+  .divider-inset {
+    height: 2px;
+    border: 0;
+    background: linear-gradient(
+      180deg,
+      hsl(240 40% 2% / 0.9) 0%,
+      hsl(240 40% 2% / 0.9) 50%,
+      hsl(0 0% 100% / 0.14) 50%,
+      hsl(0 0% 100% / 0.14) 100%
+    );
+  }
+
+  /* subtle dot grid — gives frosted glass something to blur (tip #6) */
+  .dot-grid {
+    background-image: radial-gradient(hsl(0 0% 100% / 0.16) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Prism light (tip #4 — do what's hard to do in Figma)                 */
+/* ------------------------------------------------------------------ */
+@layer components {
+  /*
+   * PERF: the prism used to be four 90px-blurred, screen-blended, animated
+   * blobs. Each one is a full-screen GPU filter re-run every frame — that
+   * alone dropped scrolling to ~1 fps on a retina display. The same look is
+   * achieved with soft radial gradients (the blur is "baked in" to the
+   * gradient stops), painted once and simply scrolled.
+   */
+  .prism {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 90rem;
+    height: 70rem;
+    pointer-events: none;
+    z-index: -10;
+    background:
+      radial-gradient(42rem 42rem at 92% 6%, hsl(236 92% 70% / 0.34) 0%, hsl(236 92% 70% / 0.12) 35%, transparent 70%),
+      radial-gradient(30rem 30rem at 70% 24%, hsl(350 90% 64% / 0.16) 0%, transparent 70%),
+      radial-gradient(26rem 26rem at 94% 40%, hsl(316 90% 70% / 0.14) 0%, transparent 70%),
+      radial-gradient(28rem 28rem at 62% 48%, hsl(32 95% 66% / 0.14) 0%, transparent 70%);
+  }
+
+  /* glow behind the contact card — same trick, no filter */
+  .glow-contact {
+    background:
+      radial-gradient(40rem 28rem at 25% 50%, hsl(236 92% 70% / 0.3) 0%, hsl(26 90% 72% / 0.12) 55%, transparent 75%);
+  }
+}
+
+/* blinking animation */
+@layer base {
   @keyframes blink {
     from {
       opacity: 1;

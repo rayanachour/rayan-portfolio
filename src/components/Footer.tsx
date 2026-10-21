@@ -1,64 +1,34 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { Github, MailIcon } from "lucide-react";
+import { Github, Mail } from "lucide-react";
 import { profile } from "@/data/content";
 
 export default function Footer() {
-  // Local time in Philadelphia, regardless of where the visitor is.
-  const [time, setTime] = useState<string>("");
-
-  useEffect(() => {
-    const tick = () =>
-      setTime(
-        new Date().toLocaleTimeString("en-US", {
-          hour12: true,
-          hour: "numeric",
-          minute: "numeric",
-          timeZone: profile.timeZone,
-        }),
-      );
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <footer className="w-full">
       <hr className="divider-inset" />
-      <div className="container mx-auto flex flex-row items-center justify-between py-6">
-        <span className="flex flex-row items-center space-x-4">
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()}{" "}
-            <Link
-              href={profile.github}
-              target="_blank"
-              className="text-foreground transition hover:text-primary"
-            >
-              {profile.name}
-            </Link>
-          </p>
-          <hr className="hidden h-6 border-l border-muted md:flex" />
-          <span className="hidden flex-row items-center space-x-2 md:flex">
-            <p className="eyebrow">Philadelphia</p>
-            <p className="font-mono text-xs text-foreground">
-              {time} {profile.timeZoneLabel}
-            </p>
-          </span>
-        </span>
-        <span className="flex flex-row items-center space-x-2">
-          <Link href={profile.github} target="_blank" aria-label="GitHub">
-            <Button variant="glass" size="sm" className="h-9 w-9 p-0">
-              <Github className="h-4 w-4" />
-            </Button>
+      <div className="container mx-auto flex flex-col gap-4 py-7 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          <span className="font-serif text-lg text-foreground">{profile.name}.</span>{" "}
+          © {new Date().getFullYear()}
+        </p>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`mailto:${profile.email}`}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Mail className="h-4 w-4" aria-hidden="true" />
+            Email Rayan
           </Link>
-          <Link href={`mailto:${profile.email}`}>
-            <Button variant="glass" size="sm">
-              <MailIcon className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:flex">{profile.email}</span>
-            </Button>
+          <Link
+            href={profile.github}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition hover:bg-card hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Rayan on GitHub"
+          >
+            <Github className="h-4 w-4" aria-hidden="true" />
           </Link>
-        </span>
+        </div>
       </div>
     </footer>
   );

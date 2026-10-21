@@ -1,463 +1,339 @@
-import Container from "@/components/Container";
-import ContactForm from "@/components/ContactForm";
-import { useEffect, useState } from "react";
-import styles from "@/styles/Home.module.css";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import Link from "next/link";
 import {
   ArrowRight,
-  CalendarCheck,
+  Bot,
+  CalendarCheck2,
   Check,
-  ChevronRight,
-  Code2,
-  Frame,
-  MonitorSmartphone,
-  SearchCheck,
-  Sparkles,
-  type LucideIcon,
+  LayoutTemplate,
+  ShieldCheck,
 } from "lucide-react";
-import { TriangleDownIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
-import { cn, scrollTo } from "@/lib/utils";
-import Image from "next/image";
-import { motion } from "framer-motion";
+import Container from "@/components/Container";
+import ContactForm from "@/components/ContactForm";
+import HeroWorkflow from "@/components/HeroWorkflow";
+import AutomationFlow from "@/components/AutomationFlow";
+import { Button } from "@/components/ui/button";
+import { scrollTo } from "@/lib/utils";
 import {
-  aboutCopy,
-  aboutStats,
-  aiAutomation,
-  audience,
+  about,
   faq,
+  hero,
   processSteps,
   profile,
   services,
+  urgency,
 } from "@/data/content";
 
-const serviceIcons: Record<string, LucideIcon> = {
-  Code2,
-  Frame,
-  SearchCheck,
-  MonitorSmartphone,
-  CalendarCheck,
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 16 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay: i * 0.08, ease: [0.2, 0.8, 0.2, 1] },
-  }),
-};
-
-const goToContact = () => scrollTo(document.querySelector("#contact"));
-
 export default function Home() {
-  const [isScrolled, setIsScrolled] = useState<boolean>(false);
-
-  // Highlight the nav link for the section in view. Native scrolling —
-  // no smooth-scroll library, so the browser can composite normally.
   useEffect(() => {
-    const sections = Array.from(document.querySelectorAll("section"));
-    const navLinks = Array.from(document.querySelectorAll(".nav-link"));
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("section"));
+    const navLinks = Array.from(
+      document.querySelectorAll<HTMLAnchorElement>(".nav-link"),
+    );
     let ticking = false;
 
-    function update() {
+    const update = () => {
       ticking = false;
       const y = window.scrollY;
-      setIsScrolled(y > 0);
+      let currentTarget = "";
 
-      let current = "";
       for (const section of sections) {
-        if (y >= section.offsetTop - 250) current = section.id;
+        if (y >= section.offsetTop - 220) {
+          currentTarget =
+            section.dataset.navTarget ?? `#${section.getAttribute("id") ?? ""}`;
+        }
       }
-      for (const link of navLinks) {
-        link.classList.toggle(
-          "nav-active",
-          link.getAttribute("href") === `#${current}`,
-        );
-      }
-    }
 
-    function onScroll() {
-      if (!ticking) {
-        ticking = true;
-        window.requestAnimationFrame(update);
-      }
-    }
+      navLinks.forEach((link) => {
+        const isActive = link.getAttribute("href") === currentTarget;
+        link.classList.toggle("nav-active", isActive);
+        if (isActive) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    };
 
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  const contactHref = profile.schedulingUrl || "#contact";
+  const contactLabel = profile.schedulingUrl
+    ? "Book a discovery call"
+    : "Request a discovery call";
+
   return (
     <Container>
       <div>
-        {/* Prism light — a single static gradient, painted once */}
         <div className="prism" aria-hidden="true" />
 
-        {/* ------------------------------------------------------------ */}
-        {/* Hero                                                           */}
-        {/* ------------------------------------------------------------ */}
         <section
           id="home"
-          className="mt-32 flex w-full flex-col items-center gap-14 xl:mt-0 xl:min-h-screen xl:flex-row xl:items-center xl:justify-between xl:gap-16"
+          className="flex min-h-screen w-full flex-col justify-center gap-12 pb-20 pt-32 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(24rem,0.95fr)] lg:items-center lg:gap-16 lg:pt-24"
         >
-          <div className={cn(styles.intro, "xl:max-w-[38rem]")}>
-            <motion.p
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="eyebrow"
-            >
-              {profile.role} — {profile.location}
-            </motion.p>
+          <div className="max-w-[42rem]">
+            <p className="eyebrow">{hero.eyebrow}</p>
+            <h1 className="display mt-6 text-[3.75rem] sm:text-7xl xl:text-[6rem]">
+              Less busywork.
+              <br />
+              <span className="text-gradient italic">More room to grow.</span>
+            </h1>
+            <p className="mt-7 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {hero.description}
+            </p>
 
-            <motion.h1
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={1}
-              className="display mt-6 text-[3.5rem] sm:text-7xl 2xl:text-[6rem]"
-            >
-              Your business,{" "}
-              <span className="text-gradient italic">running smoother.</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={2}
-              className="mt-6 max-w-lg text-base leading-relaxed tracking-tight text-muted-foreground 2xl:text-lg"
-            >
-              {profile.tagline}
-            </motion.p>
-
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={3}
-              className="mt-6 flex flex-wrap items-center gap-1.5"
-            >
-              {profile.pills.map((item) => (
-                <span key={item} className={styles.pill}>
-                  {item}
-                </span>
-              ))}
-            </motion.div>
-
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={4}
-              className="mt-8 flex flex-row flex-wrap items-center gap-3"
-            >
-              <Button variant="metal" onClick={goToContact}>
-                {profile.cta} <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-              <Button
-                variant="glass"
-                onClick={() => scrollTo(document.querySelector("#services"))}
-              >
-                See what I do
-              </Button>
-            </motion.div>
-
-            {/* Trust line */}
-            <motion.ul
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={5}
-              className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2"
-            >
-              {profile.trust.map((t) => (
-                <li
-                  key={t}
-                  className="flex items-center gap-2 text-xs tracking-tight text-muted-foreground"
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button asChild size="lg">
+                <Link
+                  href={contactHref}
+                  target={profile.schedulingUrl ? "_blank" : undefined}
+                  rel={profile.schedulingUrl ? "noreferrer" : undefined}
+                  onClick={
+                    profile.schedulingUrl
+                      ? undefined
+                      : (event) => {
+                          event.preventDefault();
+                          scrollTo(document.querySelector("#contact"));
+                        }
+                  }
                 >
-                  <Check className="h-3.5 w-3.5 text-secondary" aria-hidden="true" />
-                  {t}
+                  {contactLabel}
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+                </Link>
+              </Button>
+              <Button asChild variant="glass" size="lg">
+                <Link
+                  href="#automation-example"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    scrollTo(document.querySelector("#automation-example"));
+                  }}
+                >
+                  See how it works
+                </Link>
+              </Button>
+            </div>
+
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              {hero.microcopy}
+            </p>
+
+            <ul
+              className="mt-8 grid gap-3 sm:grid-cols-3"
+              aria-label="Working principles"
+            >
+              {hero.principles.map((principle) => (
+                <li
+                  key={principle}
+                  className="flex items-start gap-2 text-sm leading-relaxed text-foreground/80"
+                >
+                  <Check
+                    className="mt-1 h-4 w-4 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
+                  {principle}
                 </li>
               ))}
-            </motion.ul>
-
-            <div
-              className={cn(
-                styles.scroll,
-                isScrolled && styles["scroll--hidden"],
-              )}
-            >
-              <span className="eyebrow">Scroll to discover</span>
-              <TriangleDownIcon className="mt-2 animate-bounce" />
-            </div>
+            </ul>
           </div>
 
-          {/* Portrait — the glass chip overlaps the photo so the frost is visible (tip #6) */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.2, 0.8, 0.2, 1] }}
-            className="relative w-full max-w-[26rem] xl:max-w-[30rem]"
-          >
-            <div className={styles.portrait}>
-              <Image
-                src={profile.photo}
-                alt={`${profile.name}, seated on a marble bench in Philadelphia`}
-                width={692}
-                height={1024}
-                priority
-                sizes="(min-width: 1280px) 30rem, 26rem"
-              />
-            </div>
-            <div className="glass glass-frost absolute -bottom-2 left-6 right-6 flex items-center justify-between rounded-2xl px-5 py-4">
-              <div className="flex flex-col gap-1.5">
-                <span className="eyebrow">{profile.name}</span>
-                <span className="text-sm tracking-tight text-foreground">
-                  {profile.dayJob} — {profile.company}
-                </span>
-              </div>
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-secondary opacity-60" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-secondary" />
-              </span>
-            </div>
-          </motion.div>
+          <HeroWorkflow />
         </section>
 
-        {/* ------------------------------------------------------------ */}
-        {/* About                                                          */}
-        {/* ------------------------------------------------------------ */}
-        <section id="about" className="mt-40 xl:mt-0">
-          <div className="flex max-w-5xl flex-col justify-start">
-            <span className="eyebrow">About</span>
-            <h2 className="display mt-6 text-3xl leading-[1.15] text-foreground sm:text-4xl xl:text-[2.75rem]">
-              {aboutCopy}
-            </h2>
-
-            <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3 xl:gap-10">
-              {aboutStats.map((stat) => (
-                <div key={stat.label} className="flex flex-col items-start">
-                  <span className="display text-gradient text-5xl xl:text-7xl">
-                    {stat.value}
-                  </span>
-                  <span className="mt-2 max-w-[16rem] text-sm tracking-tight text-muted-foreground xl:text-base">
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
+        <section
+          id="about"
+          data-nav-target="#services"
+          className="py-24 sm:py-32"
+        >
+          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] lg:items-start">
+            <div>
+              <p className="eyebrow">{about.eyebrow}</p>
+              <h2 className="display mt-6 max-w-4xl text-4xl leading-[1.04] sm:text-5xl xl:text-6xl">
+                {about.heading}
+              </h2>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                {about.body}
+              </p>
+              <p className="mt-6 max-w-2xl border-l-2 border-primary/60 pl-5 text-base leading-relaxed text-foreground/85">
+                {profile.intro}
+              </p>
             </div>
-          </div>
 
-          {/* Who it's for */}
-          <div className="relative mt-20">
-            <div className="dot-grid absolute inset-0 -z-10" aria-hidden="true" />
-            <div className="glass flex flex-col gap-6 rounded-3xl p-8 md:flex-row md:items-center md:justify-between xl:p-10">
-              <div className="md:max-w-xs">
-                <span className="eyebrow">Who I work with</span>
-                <p className="mt-3 font-serif text-2xl tracking-tight xl:text-3xl">
-                  Owner-run businesses that live on word of mouth — and want
-                  the online experience to match.
-                </p>
-              </div>
-              <ul className="grid flex-1 grid-cols-1 gap-x-8 gap-y-2.5 sm:grid-cols-2">
-                {audience.map((a) => (
+            <aside className="glass rounded-3xl p-6 sm:p-8">
+              <p className="eyebrow">A practical fit for</p>
+              <ul className="mt-5 space-y-3">
+                {about.audience.map((item) => (
                   <li
-                    key={a}
-                    className="flex items-center gap-2.5 text-sm tracking-tight text-foreground/85"
+                    key={item}
+                    className="flex items-center gap-3 text-base text-foreground/85"
                   >
                     <span
-                      className="h-px w-4 shrink-0 bg-gradient-to-r from-primary to-secondary"
+                      className="h-px w-6 shrink-0 bg-primary"
                       aria-hidden="true"
                     />
-                    {a}
+                    {item}
                   </li>
                 ))}
               </ul>
-            </div>
+            </aside>
           </div>
         </section>
 
-        {/* ------------------------------------------------------------ */}
-        {/* Services                                                       */}
-        {/* ------------------------------------------------------------ */}
-        <section id="services" className="my-40">
-          <div>
-            <span className="eyebrow">What I do</span>
+        <section
+          id="services"
+          data-nav-target="#services"
+          className="py-24 sm:py-32"
+        >
+          <div className="max-w-3xl">
+            <p className="eyebrow">{services.eyebrow}</p>
             <h2 className="display mt-6 text-4xl sm:text-5xl xl:text-6xl">
-              More bookings. <span className="text-gradient italic">Less admin.</span>
+              {services.heading}
             </h2>
-            <p className="mt-4 max-w-2xl text-base tracking-tight text-muted-foreground xl:text-lg">
-              Two things make the biggest difference for a local business: a
-              website people trust, and the busywork handled for you. I do both.
+            <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {services.intro}
             </p>
+          </div>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ staggerChildren: 0.08 }}
-              className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          <div className="mt-12 grid gap-4 lg:grid-cols-[1.45fr_0.75fr]">
+            <article
+              className="glass glass-strong relative row-span-2 overflow-hidden rounded-[2rem] p-7 sm:p-10"
             >
-              {/* Featured: AI automation */}
-              <motion.div
-                variants={fadeUp}
-                className="glass glass-strong glass-hover relative flex flex-col overflow-hidden rounded-3xl p-8 md:col-span-2 xl:row-span-2 xl:p-10"
-              >
-                <div
-                  className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full"
-                  style={{
-                    background:
-                      "radial-gradient(closest-side, hsl(26 90% 72% / 0.28), hsl(26 90% 72% / 0.08) 50%, transparent 72%)",
-                  }}
-                  aria-hidden="true"
-                />
-                <div className="flex items-center gap-3">
-                  <span className="metal inline-flex h-10 w-10 items-center justify-center rounded-full">
-                    <Sparkles size={18} />
-                  </span>
-                  <span className="eyebrow">Most popular</span>
-                </div>
-                <h3 className="mt-6 font-serif text-3xl tracking-tight xl:text-4xl">
-                  {aiAutomation.service}
+              <div
+                className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(circle,hsl(var(--primary)/0.18),transparent_68%)]"
+                aria-hidden="true"
+              />
+              <div className="relative">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <Bot className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <p className="eyebrow mt-6">AI automation</p>
+                <h3 className="mt-3 max-w-2xl font-serif text-3xl tracking-tight sm:text-4xl">
+                  {services.automation.title}
                 </h3>
-                <p className="mt-3 max-w-xl text-base tracking-tight text-foreground/85">
-                  {aiAutomation.lead}
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+                  {services.automation.description}
                 </p>
 
-                <div className="mt-8 grid gap-8 lg:grid-cols-2">
-                  <div>
-                    <span className="eyebrow">Sound familiar?</span>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {aiAutomation.problems.map((p) => (
-                        <li
-                          key={p}
-                          className="flex gap-3 text-sm leading-relaxed tracking-tight text-muted-foreground"
-                        >
-                          <span
-                            className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary"
-                            aria-hidden="true"
-                          />
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <span className="eyebrow">What you get</span>
-                    <ul className="mt-4 flex flex-col gap-3">
-                      {aiAutomation.outcomes.map((o) => (
-                        <li
-                          key={o}
-                          className="flex gap-3 text-sm leading-relaxed tracking-tight text-foreground/85"
-                        >
-                          <Check
-                            className="mt-1 h-3.5 w-3.5 shrink-0 text-primary"
-                            aria-hidden="true"
-                          />
-                          {o}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                <ul className="mt-7 space-y-3">
+                  {services.automation.examples.map((item) => (
+                    <li
+                      key={item}
+                      className="flex gap-3 text-base leading-relaxed text-foreground/85"
+                    >
+                      <Check
+                        className="mt-1 h-4 w-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
 
-                <p className="mt-8 max-w-2xl text-sm leading-relaxed tracking-tight text-muted-foreground">
-                  {aiAutomation.solution}
+                <p className="mt-8 rounded-2xl border border-primary/15 bg-primary/[0.05] px-4 py-4 text-sm leading-relaxed text-muted-foreground">
+                  {services.automation.qualifier}
                 </p>
-                <div className="mt-6">
-                  <Button variant="metal" size="sm" onClick={goToContact}>
-                    Get a free automation audit{" "}
-                    <ChevronRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </motion.div>
+              </div>
+            </article>
 
-              {services.map((service) => {
-                const Icon = serviceIcons[service.icon] ?? Code2;
-                return (
-                  <motion.div
-                    key={service.service}
-                    variants={fadeUp}
-                    className="glass glass-hover flex flex-col items-start justify-end rounded-3xl p-8"
-                  >
-                    <Icon className="text-primary" size={20} />
-                    <span className="mt-auto pt-8 font-serif text-2xl tracking-tight text-foreground">
-                      {service.service}
-                    </span>
-                    <span className="mt-2 text-sm leading-relaxed tracking-tight text-muted-foreground">
-                      {service.description}
-                    </span>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
+            {services.supporting.map((service) => {
+              const Icon = service.icon === "Layout" ? LayoutTemplate : CalendarCheck2;
+              return (
+                <article
+                  key={service.title}
+                  className="glass rounded-[2rem] p-7 sm:p-8"
+                >
+                  <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <h3 className="mt-8 font-serif text-3xl tracking-tight">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                    {service.description}
+                  </p>
+                </article>
+              );
+            })}
+          </div>
+
+          <p className="mt-5 flex max-w-4xl items-start gap-3 text-sm leading-relaxed text-muted-foreground">
+            <ShieldCheck
+              className="mt-0.5 h-4 w-4 shrink-0 text-primary"
+              aria-hidden="true"
+            />
+            {services.deliveryNote}
+          </p>
+
+          <div id="automation-example">
+            <AutomationFlow />
           </div>
         </section>
 
-        {/* ------------------------------------------------------------ */}
-        {/* Process                                                        */}
-        {/* ------------------------------------------------------------ */}
-        <section id="process" className="my-40">
-          <div>
-            <span className="eyebrow">How it works</span>
+        <section
+          id="process"
+          data-nav-target="#process"
+          className="py-24 sm:py-32"
+        >
+          <div className="max-w-3xl">
+            <p className="eyebrow">How working together works</p>
             <h2 className="display mt-6 text-4xl sm:text-5xl xl:text-6xl">
-              Simple from <span className="text-gradient italic">start to launch</span>.
+              From one bottleneck to a{" "}
+              <span className="text-gradient italic">practical solution.</span>
             </h2>
+          </div>
 
-            <ol className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              {processSteps.map((step, i) => (
-                <motion.li
-                  key={step.step}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-80px" }}
-                  custom={i}
-                  className="glass glass-hover relative flex flex-col rounded-3xl p-8"
-                >
-                  <span className="display text-gradient text-5xl">{step.step}</span>
-                  <h3 className="mt-8 font-serif text-2xl tracking-tight">
+          <ol className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {processSteps.map((step, index) => (
+              <li
+                key={step.step}
+                className="glass relative flex min-h-[18rem] flex-col rounded-3xl p-7"
+              >
+                <span className="display text-gradient text-5xl">{step.step}</span>
+                <div className="mt-auto pt-10">
+                  <h3 className="font-serif text-2xl tracking-tight">
                     {step.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed tracking-tight text-muted-foreground">
+                  <p className="mt-3 text-base leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>
-                  {i < processSteps.length - 1 && (
-                    <ArrowRight
-                      className="absolute -right-4 top-1/2 hidden h-4 w-4 -translate-y-1/2 text-foreground/30 xl:block"
-                      aria-hidden="true"
-                    />
-                  )}
-                </motion.li>
-              ))}
-            </ol>
-          </div>
+                </div>
+                {index < processSteps.length - 1 && (
+                  <ArrowRight
+                    className="absolute -right-2 top-1/2 z-10 hidden h-4 w-4 -translate-y-1/2 text-primary xl:block"
+                    aria-hidden="true"
+                  />
+                )}
+              </li>
+            ))}
+          </ol>
         </section>
 
-        {/* ------------------------------------------------------------ */}
-        {/* FAQ                                                            */}
-        {/* ------------------------------------------------------------ */}
-        <section id="faq" className="my-40">
-          <div className="grid gap-10 xl:grid-cols-[20rem_1fr]">
+        <section
+          id="faq"
+          data-nav-target="#faq"
+          className="py-24 sm:py-32"
+        >
+          <div className="grid gap-12 lg:grid-cols-[20rem_1fr]">
             <div>
-              <span className="eyebrow">Questions</span>
+              <p className="eyebrow">Questions</p>
               <h2 className="display mt-6 text-4xl sm:text-5xl">
-                Things owners <span className="text-gradient italic">usually ask</span>.
+                Clear answers before{" "}
+                <span className="text-gradient italic">anything starts.</span>
               </h2>
-              <p className="mt-4 text-sm tracking-tight text-muted-foreground">
-                Something else on your mind? Ask it in the form below — there
-                are no silly questions.
-              </p>
             </div>
+
             <dl>
-              {faq.map((item, i) => (
+              {faq.map((item, index) => (
                 <div key={item.q}>
-                  {i > 0 && <hr className="divider-inset my-7" />}
-                  <dt className="font-serif text-2xl tracking-tight">{item.q}</dt>
-                  <dd className="mt-2 max-w-2xl text-sm leading-relaxed tracking-tight text-muted-foreground">
+                  {index > 0 && <hr className="divider-inset my-7" />}
+                  <dt className="font-serif text-2xl tracking-tight sm:text-3xl">
+                    {item.q}
+                  </dt>
+                  <dd className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">
                     {item.a}
                   </dd>
                 </div>
@@ -466,37 +342,69 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ------------------------------------------------------------ */}
-        {/* Contact                                                        */}
-        {/* ------------------------------------------------------------ */}
-        <section id="contact" className="my-40">
+        <section
+          id="contact"
+          data-nav-target="#contact"
+          className="py-24 sm:py-32"
+        >
           <div className="relative">
-            {/* texture + glow behind the glass so the frost reads (tip #6).
-                Both are plain gradients — no filter: blur — so they paint once. */}
             <div className="dot-grid absolute inset-0 -z-10" aria-hidden="true" />
-            <div className="glow-contact absolute inset-0 -z-10 rounded-[2rem]" aria-hidden="true" />
-            <div className="glass glass-frost grid gap-12 rounded-[2rem] p-8 sm:p-12 xl:grid-cols-[22rem_1fr] xl:p-16">
+            <div
+              className="glow-contact absolute inset-0 -z-10 rounded-[2rem]"
+              aria-hidden="true"
+            />
+            <div className="glass glass-frost grid gap-12 rounded-[2rem] p-7 sm:p-12 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] xl:p-16">
               <div>
-                <span className="eyebrow">Contact</span>
-                <h2 className="display mt-6 text-5xl sm:text-6xl">
-                  Let&apos;s talk about{" "}
-                  <span className="text-gradient italic">your</span> business.
+                <p className="eyebrow">Start with one workflow</p>
+                <h2 className="display mt-6 text-4xl sm:text-5xl xl:text-6xl">
+                  {urgency.heading}
                 </h2>
-                <p className="mt-5 text-base tracking-tight text-muted-foreground">
-                  Tell me a little about what you do and what&apos;s eating your
-                  time. I&apos;ll come back with ideas — free, no commitment.
+                <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+                  {urgency.body}
                 </p>
-                <div className="mt-8 flex flex-col gap-3 text-sm">
-                  <span className="eyebrow">Prefer email?</span>
-                  <Link
-                    href={`mailto:${profile.email}`}
-                    className="font-mono text-xs text-foreground underline-offset-4 hover:underline"
-                  >
-                    {profile.email}
-                  </Link>
-                </div>
+
+                {profile.schedulingUrl && (
+                  <div className="mt-8">
+                    <Button asChild size="lg">
+                      <Link
+                        href={profile.schedulingUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Book a discovery call
+                        <ArrowRight
+                          className="ml-2 h-4 w-4"
+                          aria-hidden="true"
+                        />
+                      </Link>
+                    </Button>
+                    <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                      Choose a time in the scheduler, or send an inquiry using
+                      the form.
+                    </p>
+                  </div>
+                )}
+
+                <Link
+                  href={`mailto:${profile.email}`}
+                  className="mt-7 inline-flex min-h-11 items-center text-sm text-muted-foreground underline decoration-border underline-offset-4 transition hover:text-foreground focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Email Rayan instead
+                </Link>
               </div>
-              <ContactForm />
+
+              <div>
+                <h3 className="font-serif text-3xl tracking-tight sm:text-4xl">
+                  {profile.schedulingUrl
+                    ? "Send an inquiry"
+                    : "Request a discovery call"}
+                </h3>
+                <p className="mt-3 mb-7 text-base leading-relaxed text-muted-foreground">
+                  Share the task you want to improve. This sends a request—it
+                  does not reserve a time.
+                </p>
+                <ContactForm />
+              </div>
             </div>
           </div>
         </section>

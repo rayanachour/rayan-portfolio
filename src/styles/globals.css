@@ -7,35 +7,33 @@
 /* ------------------------------------------------------------------ */
 @layer base {
   :root {
-    /* near-black with a cool tint; warm off-white text echoes the photo */
-    --background: 240 14% 5%;
-    --foreground: 40 18% 95%;
+    --background: 160 27% 4%;
+    --foreground: 140 17% 95%;
 
-    --card: 240 14% 7%;
-    --card-foreground: 40 18% 95%;
+    --card: 155 26% 8%;
+    --card-foreground: 140 17% 95%;
 
-    --popover: 240 14% 6%;
-    --popover-foreground: 40 18% 95%;
+    --popover: 155 26% 8%;
+    --popover-foreground: 140 17% 95%;
 
-    /* prism pair: violet-blue → peach. Used for gradients & accents. */
-    --primary: 236 92% 76%;
-    --primary-foreground: 240 14% 5%;
+    --primary: 149 60% 62%;
+    --primary-foreground: 160 27% 5%;
 
-    --secondary: 26 90% 72%;
-    --secondary-foreground: 220 10% 68%;
+    --secondary: 146 25% 73%;
+    --secondary-foreground: 140 17% 95%;
 
-    --muted: 240 10% 16%;
-    --muted-foreground: 225 12% 66%;
+    --muted: 153 25% 13%;
+    --muted-foreground: 141 9% 68%;
 
-    --accent: 240 10% 16%;
-    --accent-foreground: 40 18% 95%;
+    --accent: 153 25% 13%;
+    --accent-foreground: 140 17% 95%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 18%;
-    --input: 240 10% 20%;
-    --ring: 236 92% 76%;
+    --border: 151 18% 20%;
+    --input: 151 18% 20%;
+    --ring: 149 60% 62%;
 
     --radius: 0.75rem;
   }
@@ -45,26 +43,19 @@
 /* Base elements                                                       */
 /* ------------------------------------------------------------------ */
 @layer base {
-  html[data-scroll-orientation="horizontal"] {
-    body {
-      @apply w-fit;
-    }
-    [data-scroll-container] {
-      @apply flex;
-    }
-  }
   * {
     @apply border-border;
   }
   html {
     @apply antialiased;
+    scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground cursor-wait;
+    @apply bg-background text-foreground;
     font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
   section {
-    scroll-margin-top: 60px;
+    scroll-margin-top: 88px;
   }
   ::selection {
     background: hsl(var(--primary) / 0.35);
@@ -107,15 +98,15 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-br from-primary via-primary to-secondary bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent;
   }
 
   .nav-link {
-    @apply font-mono text-xs lowercase text-slate-400 transition-colors duration-300 hover:text-foreground;
+    @apply font-mono text-xs lowercase text-muted-foreground transition-colors duration-300 hover:text-foreground;
     letter-spacing: 0.06em;
   }
   .nav-active {
-    @apply text-foreground;
+    @apply text-primary;
   }
 }
 
@@ -141,28 +132,28 @@
   .glass {
     position: relative;
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.07) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 18% 11% / 0.85);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.055) 0%, transparent 60%),
+      hsl(155 26% 8% / 0.9);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.22),
-      inset 0 -1px 0 0 hsl(0 0% 100% / 0.32),
-      0 30px 60px -30px hsl(240 40% 2% / 0.9);
+      inset 0 1px 0 hsl(140 30% 98% / 0.12),
+      inset 0 -1px 0 hsl(149 60% 62% / 0.12),
+      0 30px 60px -34px hsl(160 50% 2% / 0.9);
   }
   .glass-frost {
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.07) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 30% 70% / 0.08);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.07) 0%, transparent 60%),
+      hsl(155 30% 16% / 0.35);
     -webkit-backdrop-filter: blur(18px) saturate(140%);
     backdrop-filter: blur(18px) saturate(140%);
   }
   .glass-strong {
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 18% 13% / 0.9);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.07) 0%, transparent 58%),
+      hsl(153 25% 11% / 0.96);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.3),
-      inset 0 -1px 0 0 hsl(0 0% 100% / 0.42),
-      0 40px 80px -30px hsl(240 40% 2% / 0.95);
+      inset 0 1px 0 hsl(140 30% 98% / 0.14),
+      inset 0 -1px 0 hsl(149 60% 62% / 0.16),
+      0 40px 80px -36px hsl(160 50% 2% / 0.95);
   }
   .glass-hover {
     transition:
@@ -173,28 +164,28 @@
   .glass-hover:hover {
     transform: translateY(-2px);
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 18% 14% / 0.9);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.08) 0%, transparent 60%),
+      hsl(153 25% 13% / 0.96);
   }
 
   /* Frosted-glass form field. 48px tall → 16px radius; padding matches. */
   .glass-input {
-    @apply w-full rounded-2xl px-4 py-3 text-sm tracking-tight text-foreground outline-none placeholder:text-muted-foreground/60;
+    @apply min-h-12 w-full rounded-2xl px-4 py-3 text-base tracking-tight text-foreground outline-none placeholder:text-muted-foreground/60;
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.06) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 30% 70% / 0.06);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.05) 0%, transparent 60%),
+      hsl(153 25% 13% / 0.72);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.18),
-      inset 0 -1px 0 0 hsl(0 0% 100% / 0.26),
-      0 0 0 1px hsl(0 0% 100% / 0.04);
+      inset 0 1px 0 hsl(140 30% 98% / 0.1),
+      inset 0 -1px 0 hsl(149 60% 62% / 0.1),
+      0 0 0 1px hsl(var(--border));
     transition:
       box-shadow 0.25s ease,
       background 0.25s ease;
   }
   .glass-input:hover {
     background:
-      linear-gradient(180deg, hsl(0 0% 100% / 0.08) 0%, hsl(0 0% 100% / 0) 60%),
-      hsl(240 30% 70% / 0.08);
+      linear-gradient(180deg, hsl(140 30% 98% / 0.07) 0%, transparent 60%),
+      hsl(153 25% 15% / 0.8);
   }
   .glass-input:focus-visible {
     box-shadow:
@@ -204,35 +195,36 @@
       0 0 0 5px hsl(var(--primary) / 0.15);
   }
 
-  /*
-   * Brushed metal. Light gradient, dark text, dark bottom edge, tight shadow
-   * (it sits right on the surface, so blur stays ≤ 4px).
-   */
-  .metal {
-    color: hsl(240 14% 8%);
-    background: linear-gradient(180deg, #f7f4ee 0%, #e4dfd6 55%, #d6d0c6 100%);
+  .primary-action {
+    color: hsl(var(--primary-foreground));
+    background: linear-gradient(180deg, hsl(149 66% 68%), hsl(var(--primary)));
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.95),
-      inset 0 -1px 0 0 hsl(30 10% 20% / 0.22),
-      0 1px 2px 0 hsl(240 40% 2% / 0.5),
-      0 4px 4px -2px hsl(240 40% 2% / 0.35);
+      inset 0 1px 0 hsl(140 30% 98% / 0.45),
+      inset 0 -1px 0 hsl(160 50% 12% / 0.32),
+      0 4px 16px -6px hsl(149 60% 50% / 0.45);
     transition:
       transform 0.25s ease,
       filter 0.25s ease,
       box-shadow 0.25s ease;
   }
-  .metal:hover {
-    filter: brightness(1.04);
+  .primary-action:hover {
+    filter: brightness(1.06);
     transform: translateY(-1px);
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.95),
-      inset 0 -1px 0 0 hsl(30 10% 20% / 0.22),
-      0 2px 3px 0 hsl(240 40% 2% / 0.5),
-      0 8px 10px -4px hsl(240 40% 2% / 0.4);
+      inset 0 1px 0 hsl(140 30% 98% / 0.5),
+      inset 0 -1px 0 hsl(160 50% 12% / 0.32),
+      0 8px 24px -8px hsl(149 60% 50% / 0.55);
   }
-  .metal:active {
+  .primary-action:active {
     transform: translateY(0);
     filter: brightness(0.98);
+  }
+  .option-selected {
+    color: hsl(var(--primary-foreground));
+    background: hsl(var(--primary));
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--primary) / 0.55);
   }
 
   /*
@@ -244,16 +236,16 @@
     border: 0;
     background: linear-gradient(
       180deg,
-      hsl(240 40% 2% / 0.9) 0%,
-      hsl(240 40% 2% / 0.9) 50%,
-      hsl(0 0% 100% / 0.14) 50%,
-      hsl(0 0% 100% / 0.14) 100%
+      hsl(160 50% 2% / 0.9) 0%,
+      hsl(160 50% 2% / 0.9) 50%,
+      hsl(149 40% 80% / 0.12) 50%,
+      hsl(149 40% 80% / 0.12) 100%
     );
   }
 
   /* subtle dot grid — gives frosted glass something to blur (tip #6) */
   .dot-grid {
-    background-image: radial-gradient(hsl(0 0% 100% / 0.16) 1px, transparent 1px);
+    background-image: radial-gradient(hsl(149 40% 80% / 0.14) 1px, transparent 1px);
     background-size: 22px 22px;
     -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
@@ -281,30 +273,28 @@
     pointer-events: none;
     z-index: -10;
     background:
-      radial-gradient(42rem 42rem at 92% 6%, hsl(236 92% 70% / 0.34) 0%, hsl(236 92% 70% / 0.12) 35%, transparent 70%),
-      radial-gradient(30rem 30rem at 70% 24%, hsl(350 90% 64% / 0.16) 0%, transparent 70%),
-      radial-gradient(26rem 26rem at 94% 40%, hsl(316 90% 70% / 0.14) 0%, transparent 70%),
-      radial-gradient(28rem 28rem at 62% 48%, hsl(32 95% 66% / 0.14) 0%, transparent 70%);
+      radial-gradient(42rem 42rem at 92% 6%, hsl(149 60% 42% / 0.26) 0%, hsl(149 60% 42% / 0.09) 35%, transparent 70%),
+      radial-gradient(30rem 30rem at 70% 24%, hsl(165 48% 32% / 0.16) 0%, transparent 70%),
+      radial-gradient(28rem 28rem at 94% 40%, hsl(132 34% 48% / 0.12) 0%, transparent 70%);
   }
 
   /* glow behind the contact card — same trick, no filter */
   .glow-contact {
     background:
-      radial-gradient(40rem 28rem at 25% 50%, hsl(236 92% 70% / 0.3) 0%, hsl(26 90% 72% / 0.12) 55%, transparent 75%);
+      radial-gradient(40rem 28rem at 25% 50%, hsl(149 60% 46% / 0.25) 0%, hsl(146 25% 58% / 0.09) 55%, transparent 75%);
   }
 }
 
-/* blinking animation */
-@layer base {
-  @keyframes blink {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  .animate-blink {
-    animation: blink 1s infinite;
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

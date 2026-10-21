@@ -1,38 +1,35 @@
-# Rayan Achour — Portfolio
+# Rayan — Business Portfolio
 
-Personal portfolio for Rayan Achour, Senior Software Engineer (Philadelphia, PA).
-Built with Next.js 14, TypeScript, Tailwind, shadcn/ui, Framer Motion and Locomotive Scroll.
+Business-focused portfolio for a solo engineer offering practical websites and
+AI automation.
+Built with Next.js 14, TypeScript, Tailwind, shadcn/ui, and Framer Motion.
 Forked from [wendoj/developer-portfolio](https://github.com/wendoj/developer-portfolio) and redesigned.
 
 ## Editing content
 
-Everything lives in one file: `src/data/content.ts` — hero copy, stats, audience,
-services, the AI-automation pitch, process steps, FAQ and contact options.
+Everything lives in one file: `src/data/content.ts` — hero copy, audience,
+services, the AI-automation examples, process steps, FAQ and contact options.
 Components only render what's there. The audience is business owners, so keep
 copy plain and outcome-focused.
-
-The portrait is `public/assets/rayan.jpg`.
 
 ### Contact form
 
 `src/components/ContactForm.tsx` posts JSON to `NEXT_PUBLIC_FORM_ENDPOINT`
-(Formspree / Web3Forms / your own API). If the variable is unset, submitting
-opens the visitor's email client with a pre-filled message instead — so the form
-works even before you configure anything.
+(Formspree / Web3Forms / your own API). If the variable is unset, the action
+clearly opens a pre-filled email draft and does not claim delivery.
 
-### Portfolio of apps
+Set `NEXT_PUBLIC_SCHEDULING_URL` to a real scheduler URL to change the primary
+CTA from “Request a discovery call” to “Book a discovery call.”
 
-The section is removed for now. The `Project` type and an empty `projects` array
-remain in `content.ts`; add entries and re-add a projects section when there are
-apps to show.
-
-Set `NEXT_PUBLIC_SITE_URL` in `.env` once the site has a domain (used for canonical / og:url tags).
+Set `NEXT_PUBLIC_SITE_URL` once the site has a domain (used for canonical and
+social-preview metadata).
 
 ## Design system
 
 - **Type**: Instrument Serif (headlines, italic accents) · JetBrains Mono (uppercase labels) · DM Sans (body)
-- **Materials** (`src/styles/globals.css`): `.glass`, `.glass-strong`, `.metal`, `.divider-inset`, `.dot-grid`
-- **Background**: `.prism` — blurred screen-blended light blobs
+- **Palette**: forest surfaces, emerald actions, sage secondary accents
+- **Materials** (`src/styles/globals.css`): `.glass`, `.glass-strong`, `.glass-frost`, `.divider-inset`, `.dot-grid`
+- **Background**: `.prism` — static radial gradients for smooth scrolling
 
 ## Run locally
 

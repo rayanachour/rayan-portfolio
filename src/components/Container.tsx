@@ -1,17 +1,14 @@
 import Head from "next/head";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cn, scrollTo } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/router";
-import Preloader from "@/components/Preloader";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import styles from "@/styles/Container.module.css";
 import { profile } from "@/data/content";
-
-type IconProps = {
-  ["data-hide"]: boolean;
-};
 
 type ContainerProps = {
   children: React.ReactNode;
@@ -23,27 +20,12 @@ type ContainerProps = {
 type NavProps = {
   text: string;
   href: string;
-  i: number;
-  className?: string;
-};
-
-const variants = {
-  visible: (i: number) => ({
-    opacity: 1,
-    transition: {
-      delay: i * 0.12,
-    },
-  }),
-  hidden: { opacity: 0 },
 };
 
 const navLinks = [
-  { href: "#home", text: "Home" },
-  { href: "#about", text: "About" },
-  { href: "#services", text: "Services" },
+  { href: "#services", text: "Solutions" },
   { href: "#process", text: "How it works" },
   { href: "#faq", text: "FAQ" },
-  { href: "#contact", text: "Contact" },
 ];
 
 function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
@@ -58,70 +40,110 @@ function handleClick(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
 
 function NavItem(props: NavProps) {
   return (
-    <motion.li
-      className={props.className}
-      variants={variants}
-      custom={props.i}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-    >
-      <a
-        href={props.href}
-        onClick={handleClick}
-        className={cn(props.i === 0 && "nav-active", "nav-link")}
-      >
+    <li>
+      <a href={props.href} onClick={handleClick} className="nav-link">
         {props.text}
       </a>
-    </motion.li>
+    </li>
   );
 }
 
 export default function Container(props: ContainerProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
 
   const { children, ...customMeta } = props;
   const router = useRouter();
   const meta = {
-    title: `${profile.name} — Websites & AI Automation for Businesses`,
-    description: `${profile.tagline} Based in ${profile.location}.`,
-    image: profile.photo,
+    title: `${profile.name} — Websites & Practical AI Automation`,
+    description:
+      "Practical websites and automations built around how your business works.",
     type: "website",
     ...customMeta,
   };
   const pageUrl = profile.siteUrl ? `${profile.siteUrl}${router.asPath}` : "";
+  const socialImage = profile.siteUrl
+    ? `${profile.siteUrl}${profile.socialImage}`
+    : "";
+  const contactHref = profile.schedulingUrl || "#contact";
+  const contactLabel = profile.schedulingUrl
+    ? "Book a discovery call"
+    : "Request a discovery call";
 
-  // handle scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0);
     };
 
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // preloader effect
   useEffect(() => {
-    const t = setTimeout(() => {
-      setIsLoading(false);
-      document.body.style.cursor = "default";
-      window.scrollTo(0, 0);
-    }, 2300);
-    return () => clearTimeout(t);
-  }, []);
+    if (!isOpen) return;
+
+    const menu = menuRef.current;
+    const menuButton = menuButtonRef.current;
+    const main = document.querySelector("main");
+    const footer = document.querySelector("footer");
+    const focusableSelector =
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    main?.setAttribute("inert", "");
+    footer?.setAttribute("inert", "");
+    document.body.style.overflow = "hidden";
+
+    const focusTimer = window.requestAnimationFrame(() => {
+      menu?.querySelector<HTMLElement>(focusableSelector)?.focus();
+    });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !menu) return;
+      const focusable = Array.from(
+        menu.querySelectorAll<HTMLElement>(focusableSelector),
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusTimer);
+      document.removeEventListener("keydown", handleKeyDown);
+      main?.removeAttribute("inert");
+      footer?.removeAttribute("inert");
+      document.body.style.overflow = "";
+      menuButton?.focus();
+    };
+  }, [isOpen]);
+
+  const closeMenu = () => setIsOpen(false);
 
   return (
     <>
       <Head>
         <title>{meta.title}</title>
         <meta name="robots" content="follow, index" />
-        <meta name="theme-color" content="#0b0b12" />
+        <meta name="theme-color" content="#080E0C" />
         <meta content={meta.description} name="description" />
         {pageUrl && <meta property="og:url" content={pageUrl} />}
         {pageUrl && <link rel="canonical" href={pageUrl} />}
@@ -129,16 +151,16 @@ export default function Container(props: ContainerProps) {
         <meta property="og:site_name" content={profile.name} />
         <meta property="og:description" content={meta.description} />
         <meta property="og:title" content={meta.title} />
-        <meta property="og:image" content={meta.image} />
+        {socialImage && <meta property="og:image" content={socialImage} />}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={meta.title} />
         <meta name="twitter:description" content={meta.description} />
-        <meta name="twitter:image" content={meta.image} />
+        {socialImage && <meta name="twitter:image" content={socialImage} />}
         <link rel="icon" href="/favicon.png" type="image/png" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </Head>
-      <nav
+      <header
         className={cn(
           styles.nav,
           isScrolled
@@ -146,164 +168,124 @@ export default function Container(props: ContainerProps) {
             : "bg-transparent",
         )}
       >
-        <div className="absolute inset-y-0 right-0 flex items-center sm:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className={cn(
-              styles.burger,
-              "inline-flex transform items-center justify-center rounded-md p-2 transition-all duration-300 focus:outline-none",
-            )}
-            aria-controls="mobile-menu"
-            aria-expanded={isOpen}
-          >
-            <span className="sr-only">Open main menu</span>
-            <MenuIcon data-hide={isOpen} />
-            <CrossIcon data-hide={!isOpen} />
-          </button>
-        </div>
-        <Link href="/" className="font-serif text-2xl tracking-tight">
+        <Link
+          href="#home"
+          onClick={handleClick}
+          className="font-serif text-2xl tracking-tight focus-visible:rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           {profile.handle}
           <span className="text-gradient">.</span>
         </Link>
 
-        {/* Desktop menu */}
-        <ul className={styles["desktop-nav"]}>
-          {navLinks.map((link, i) => (
-            <NavItem
-              key={link.href}
-              href={link.href}
-              text={link.text}
-              i={i}
-              className="text-base"
-            />
-          ))}
-        </ul>
+        <div className="hidden items-center gap-6 sm:flex">
+          <nav aria-label="Primary navigation">
+            <ul className={styles["desktop-nav"]}>
+              {navLinks.map((link) => (
+                <NavItem key={link.href} {...link} />
+              ))}
+            </ul>
+          </nav>
+          <Button asChild size="sm">
+            <Link
+              href={contactHref}
+              target={profile.schedulingUrl ? "_blank" : undefined}
+              rel={profile.schedulingUrl ? "noreferrer" : undefined}
+              onClick={profile.schedulingUrl ? undefined : handleClick}
+            >
+              {contactLabel}
+            </Link>
+          </Button>
+        </div>
 
-        {/* Mobile menu */}
-        <AnimatePresence key="menu">
+        <button
+          ref={menuButtonRef}
+          type="button"
+          onClick={() => setIsOpen(true)}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:hidden"
+          aria-controls="mobile-menu"
+          aria-expanded={isOpen}
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-5 w-5" aria-hidden="true" />
+        </button>
+
+        <AnimatePresence>
           {isOpen && (
             <motion.div
-              className="fixed right-0 top-0 z-40 flex h-screen w-full flex-col justify-start overflow-y-hidden bg-background"
-              initial={{ x: "100%" }}
+              ref={menuRef}
+              id="mobile-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Navigation menu"
+              className="fixed inset-0 z-50 flex min-h-0 flex-col overflow-y-auto bg-background px-5 pb-8"
+              initial={reduceMotion ? false : { x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ duration: 1, type: "spring", bounce: 0.25 }}
+              exit={reduceMotion ? { opacity: 0 } : { x: "100%" }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }
+              }
             >
-              {/* Expandable menu */}
-              <div className="flex h-20 max-h-20 min-h-[60px] w-full items-center justify-between border-b pl-[22px] pr-1">
-                <span className="eyebrow">Menu</span>
+              <div className="flex min-h-20 items-center justify-between border-b border-border">
+                <span className="font-serif text-2xl">
+                  {profile.handle}
+                  <span className="text-gradient">.</span>
+                </span>
                 <button
-                  onClick={() => setIsOpen(!isOpen)}
-                  className={styles.burger}
-                  aria-controls="mobile-menu"
-                  aria-expanded={isOpen}
+                  type="button"
+                  onClick={closeMenu}
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label="Close navigation menu"
                 >
-                  <span className="sr-only">Close main menu</span>
-                  <CrossIcon data-hide={!isOpen} />
+                  <X className="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
-              <div className="flex h-full flex-col items-start justify-between overflow-y-auto">
-                {/* Links */}
-                <ul className="flex min-h-fit w-full flex-col items-start space-y-6 px-[22px] py-[58px]">
-                  {navLinks.map((link, i) => (
-                    <button key={link.href} onClick={() => setIsOpen(false)}>
-                      <NavItem
+
+              <nav aria-label="Mobile navigation" className="flex flex-1 flex-col py-10">
+                <ul className="flex flex-col gap-2">
+                  {navLinks.map((link) => (
+                    <li key={link.href}>
+                      <a
                         href={link.href}
-                        text={link.text}
-                        i={i}
-                        className="text-xl"
-                      />
-                    </button>
+                        onClick={(event) => {
+                          handleClick(event);
+                          closeMenu();
+                        }}
+                        className="block min-h-12 rounded-xl px-3 py-3 font-serif text-3xl tracking-tight text-foreground hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {link.text}
+                      </a>
+                    </li>
                   ))}
                 </ul>
 
-                {/* Footer */}
-                <div className="flex min-h-fit w-full flex-col space-y-8 px-[22px] py-10">
-                  <span className="text-sm text-muted-foreground">
-                    © {new Date().getFullYear()} {profile.name}
-                  </span>
+                <div className="mt-auto pt-10">
+                  <Button asChild size="lg" className="w-full">
+                    <Link
+                      href={contactHref}
+                      target={profile.schedulingUrl ? "_blank" : undefined}
+                      rel={profile.schedulingUrl ? "noreferrer" : undefined}
+                      onClick={(event) => {
+                        if (!profile.schedulingUrl) handleClick(event);
+                        closeMenu();
+                      }}
+                    >
+                      {contactLabel}
+                    </Link>
+                  </Button>
+                  <p className="mt-4 text-center text-xs leading-relaxed text-muted-foreground">
+                    Start with one repetitive task. No technical knowledge needed.
+                  </p>
                 </div>
-              </div>
+              </nav>
             </motion.div>
           )}
         </AnimatePresence>
-        <style jsx global>{`
-          html,
-          body {
-            overflow-y: ${isOpen ? "hidden" : "initial"};
-            scrollbar-width: ${isOpen ? "none" : "unset"};
-            -ms-overflow-style: ${isOpen ? "none" : "unset"};
-            touch-action: ${isOpen ? "none" : "unset"};
-            -ms-touch-action: ${isOpen ? "none" : "unset"};
-          }
-        `}</style>
-      </nav>
+      </header>
 
-      {/* Preloader */}
-      <AnimatePresence mode="wait">
-        {isLoading && <Preloader />}
-      </AnimatePresence>
-
-      {/* Main content */}
       <main className={cn("container", props.className)}>{children}</main>
       <Footer />
     </>
-  );
-}
-
-function MenuIcon(props: IconProps) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="absolute h-5 w-5 text-neutral-100"
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      {...props}
-    >
-      <path
-        d="M2.5 2.5H17.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2.5 7.5H17.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M2.5 12.5H17.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CrossIcon(props: IconProps) {
-  return (
-    <svg
-      className="absolute h-5 w-5 text-neutral-100"
-      viewBox="0 0 24 24"
-      width="24"
-      height="24"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-      shapeRendering="geometricPrecision"
-      {...props}
-    >
-      <path d="M18 6L6 18" />
-      <path d="M6 6l12 12" />
-    </svg>
   );
 }

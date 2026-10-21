@@ -10,8 +10,10 @@ export function scrollTo(element: Element | null) {
   if (!element) return;
 
   element.scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-    inline: "center",
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth",
+    block: "start",
+    inline: "nearest",
   });
 }

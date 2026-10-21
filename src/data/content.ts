@@ -1,191 +1,182 @@
 /**
- * Single source of truth for everything on the site.
- * Audience: business owners (salons, studios, clinics, local services) who
- * want a website or AI automation — NOT engineers. Keep copy plain and
- * outcome-focused. Edit this file; components only render what's here.
+ * Business-facing copy and configuration.
+ * Keep this plain, specific, and free of unsupported claims.
  */
-
 export const profile = {
-  firstName: "Rayan",
-  lastName: "Achour",
-  name: "Rayan Achour",
+  name: "Rayan",
   handle: "rayan",
-  role: "Websites & AI automation for businesses",
-  dayJob: "Senior Software Engineer",
-  company: "JPMorgan Chase",
-  location: "Philadelphia, PA",
-  timeZone: "America/New_York",
-  timeZoneLabel: "ET",
   email: "rachour511@gmail.com",
   github: "https://github.com/rayanachour",
-  githubHandle: "rayanachour",
-  /** Set NEXT_PUBLIC_SITE_URL in .env once the site has a domain. */
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "",
-  /**
-   * Contact form endpoint (Formspree / Web3Forms / your own API).
-   * If unset, the form falls back to opening the visitor's email client.
-   */
   formEndpoint: process.env.NEXT_PUBLIC_FORM_ENDPOINT ?? "",
-  photo: "/assets/rayan.jpg",
-  tagline:
-    "I build websites that bring in customers and automations that handle the busywork — so you can run your business.",
+  schedulingUrl: process.env.NEXT_PUBLIC_SCHEDULING_URL ?? "",
+  socialImage: "/social-preview.png",
   intro:
-    "You're great at what you do. You shouldn't also have to be a web designer, a receptionist and a bookkeeper. I build the website that makes people book, and the quiet automations that answer, remind and follow up while you work.",
-  trust: [
-    "Senior engineer at JPMorgan Chase",
-    "Based in Philadelphia",
-    "English · French · Arabic · Spanish",
-  ],
-  // The four languages Rayan speaks — used by the preloader.
-  greetings: ["Hello", "Bonjour", "مرحباً", "Hola"],
-  // Plain-English "what I do" pills for the hero
-  pills: ["websites", "online booking", "ai receptionist", "lead follow-up"],
-  // Primary CTA copy, used everywhere
-  cta: "Book a free consultation",
+    "I’m Rayan, a software engineer building practical websites and automations around how your business works.",
 } as const;
 
-export const aboutCopy =
-  "By day I'm a senior engineer at JPMorgan Chase, building systems that millions of people rely on. On the side I bring that same care to small businesses — salons, studios, clinics, local services — so your website looks premium, works on every phone, and the repetitive stuff runs itself.";
+export const hero = {
+  eyebrow: "Websites & practical AI automation",
+  headline: "Less busywork. More room to grow.",
+  description:
+    "I build websites and automations that help your business respond to customers, simplify bookings, and keep everyday work moving.",
+  principles: [
+    "Built around your workflow",
+    "Clear scope before development",
+    "Human handoff when needed",
+  ],
+  microcopy:
+    "Start with one repetitive task. No technical knowledge needed.",
+} as const;
 
-export const aboutStats = [
-  { value: "3+", label: "Years building software at a major bank" },
-  { value: "1:1", label: "You work directly with me — no agency handoffs" },
-  { value: "4", label: "Languages spoken, for you and your customers" },
-] as const;
+export const heroWorkflow = {
+  label: "Example workflow",
+  title: "From inquiry to next step",
+  steps: [
+    "A customer asks a question",
+    "The assistant replies using your approved information",
+    "They receive a booking link or your team takes over",
+  ],
+  caption: "Illustrative example—not a live customer conversation.",
+} as const;
 
-export const audience = [
-  "Salons & barbershops",
-  "Spas & skin studios",
-  "Tattoo & beauty studios",
-  "Clinics & wellness",
-  "Restaurants & cafés",
-  "Contractors & local services",
-  "Coaches & consultants",
-  "Any small team drowning in admin",
-] as const;
+export const about = {
+  eyebrow: "Built around your business",
+  heading:
+    "You don’t need more tools. You need less work falling through the cracks.",
+  body:
+    "Missed inquiries, manual reminders, and scattered information take attention away from customers. I help identify the repetitive work and build a practical way to handle it.",
+  audience: [
+    "Appointment-based businesses",
+    "Local service businesses",
+    "Consultants and small teams",
+    "Owner-operated businesses",
+  ],
+} as const;
+
+export const services = {
+  eyebrow: "Solutions",
+  heading: "Practical support for the work customers can’t see.",
+  intro:
+    "Start with the part of your business that creates the most friction. The solution should make the next step clearer—not add another system to manage.",
+  automation: {
+    title: "Let repetitive work move without constant chasing.",
+    description:
+      "Connect the right steps so inquiries, reminders, and follow-ups don’t depend on someone remembering every time.",
+    examples: [
+      "Respond to common questions using approved information.",
+      "Route inquiries and send booking links.",
+      "Trigger reminders and follow-ups from connected tools.",
+    ],
+    qualifier:
+      "What’s possible depends on your tools and workflow. Important or unusual requests can be routed to a person.",
+  },
+  supporting: [
+    {
+      title: "Websites that make the next step clear",
+      description:
+        "A clear, mobile-friendly website that helps customers understand your business and take action.",
+      icon: "Layout",
+    },
+    {
+      title: "Booking & follow-up",
+      description:
+        "Connect forms, calendars, and reminders so less information needs to be copied by hand.",
+      icon: "Calendar",
+    },
+  ],
+  deliveryNote:
+    "Responsive design, performance, accessibility, and essential search metadata are part of every website delivery.",
+} as const;
+
+export const automationFlow = {
+  heading: "What this could look like in your business",
+  intro: "An example—not a one-size-fits-all package.",
+  steps: [
+    {
+      step: "01",
+      title: "A customer reaches out",
+      description:
+        "A message arrives through a connected website form or supported messaging channel.",
+    },
+    {
+      step: "02",
+      title: "They get a useful response",
+      description:
+        "Common questions are answered using information you approve.",
+    },
+    {
+      step: "03",
+      title: "The next step is clear",
+      description:
+        "The customer receives a booking link, or the request is passed to your team.",
+    },
+    {
+      step: "04",
+      title: "Follow-up happens",
+      description:
+        "Once an appointment is recorded in a connected system, reminders can be sent automatically.",
+    },
+  ],
+  note: "You decide what gets automated and when a person steps in.",
+} as const;
 
 export const processSteps = [
   {
     step: "01",
-    title: "Tell me what you need",
+    title: "Find the bottleneck",
     description:
-      "Fill in the short form below or email me. A sentence or two is plenty — I'll ask the right questions.",
+      "We look at the repetitive task that takes too much attention.",
   },
   {
     step: "02",
-    title: "Free consultation & flat quote",
+    title: "Agree on the plan",
     description:
-      "We talk for 20 minutes about your business and goals. You get a clear plan and one price. No surprises later.",
+      "You get a clear scope, proposed approach, and pricing before development.",
   },
   {
     step: "03",
-    title: "See it before you commit",
+    title: "Test it together",
     description:
-      "I build a live preview you can open on your phone. We refine it together until it feels like your brand.",
+      "We review the workflow using realistic examples and refine the handoff.",
   },
   {
     step: "04",
-    title: "Launch, then I stay around",
+    title: "Launch with clarity",
     description:
-      "I handle the technical setup end to end. After launch, I'm one message away for updates and fixes.",
+      "You know what runs automatically, what needs your attention, and what support is included.",
   },
 ] as const;
-
-export const services = [
-  {
-    service: "Website Design & Build",
-    description:
-      "A premium, fast website that makes people trust you and book — designed around your brand, not a template.",
-    icon: "Code2",
-  },
-  {
-    service: "Looks Perfect on Every Phone",
-    description:
-      "Most of your customers will find you on a phone in a waiting room. Your site will look sharp there, and on a 4K screen.",
-    icon: "MonitorSmartphone",
-  },
-  {
-    service: "Get Found on Google",
-    description:
-      "Set up so local searches like “barber near me” actually find you — the right words, speed, and structure.",
-    icon: "SearchCheck",
-  },
-  {
-    service: "Design That Feels Like You",
-    description:
-      "Colors, type and photos chosen with intent, so the site matches the experience people get when they walk in.",
-    icon: "Frame",
-  },
-  {
-    service: "Booking, Payments & Reminders",
-    description:
-      "Online booking, deposits and automatic reminders wired in — fewer no-shows, fewer phone calls, more revenue.",
-    icon: "CalendarCheck",
-  },
-] as const;
-
-export const aiAutomation = {
-  service: "AI Automation for Your Business",
-  lead: "Most small businesses don't have a technology problem — they have a repetition problem.",
-  problems: [
-    "A customer messages at 9 pm and nobody replies until tomorrow — they book elsewhere.",
-    "You're typing the same info into your calendar, your phone and your spreadsheet.",
-    "No-shows cost you money because reminders depend on someone remembering.",
-    "You know you should ask for reviews after every visit — it rarely happens.",
-  ],
-  outcomes: [
-    "Replies to inquiries in seconds, 24/7, in your tone",
-    "Appointments booked, confirmed and reminded automatically",
-    "Review requests sent after every visit",
-    "A weekly summary of leads, bookings and revenue in your inbox",
-  ],
-  solution:
-    "I set up assistants and workflows that connect the tools you already use — your phone, calendar, Instagram, email — and quietly do the repetitive work. You only step in for the exceptions.",
-} as const;
 
 export const faq = [
   {
-    q: "Do I need to understand tech?",
-    a: "No. You tell me how your business works; I handle everything technical and explain it in plain English.",
+    q: "Do I need to understand AI?",
+    a: "No. You explain how the work happens today, and I translate that into a practical approach in plain English.",
   },
   {
-    q: "How long does it take?",
-    a: "Most websites go live within a few weeks of our first call. Smaller automations can be running in days.",
+    q: "Can this work with the tools I already use?",
+    a: "Possibly. I check compatibility, access, and limitations before recommending an approach.",
   },
   {
-    q: "What does it cost?",
-    a: "You get one flat quote after the free consultation, based on exactly what you need. No hourly surprises.",
+    q: "What happens when a person needs to take over?",
+    a: "The handoff is designed around your workflow, including which requests should stop and reach a person.",
   },
   {
-    q: "Can I update the site myself?",
-    a: "Yes — I'll show you how. Or send me a message and I'll make the change for you.",
-  },
-  {
-    q: "I already have a website. Can you improve it?",
-    a: "Absolutely. I'll review what you have and tell you honestly whether to refine it or start fresh.",
+    q: "How are pricing and timing decided?",
+    a: "Scope, costs, dependencies, and timing are discussed before development begins.",
   },
 ] as const;
+
+export const urgency = {
+  heading: "What keeps getting pushed to tomorrow?",
+  body:
+    "If inquiries, reminders, or admin keep slipping, start with one workflow. We’ll look at what can be simplified and whether automation is the right fit.",
+} as const;
 
 export const contactOptions = [
-  "A new website",
-  "Improve my current website",
-  "AI automation",
-  "Website + automation",
+  "Customer inquiries",
+  "Booking & reminders",
+  "Follow-up",
+  "Website",
   "Not sure yet",
 ] as const;
-
-/* ------------------------------------------------------------------ */
-/* Portfolio of apps — section removed for now; data model kept so the   */
-/* carousel can be re-added once there are apps to show.                 */
-/* ------------------------------------------------------------------ */
-export type Project = {
-  index: string;
-  title: string;
-  org: string;
-  description: string;
-  flow: readonly string[];
-  hue: number;
-  href?: string;
-};
-
-export const projects: readonly Project[] = [];
